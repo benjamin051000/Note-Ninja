@@ -1,0 +1,15 @@
+
+# Ignore everything
+*
+
+### Exclusions ###
+# Subdirectories
+!*/
+
+!.gitignore
+
+# Quartus project/settings files
+!*.q[ps]f
+
+# VHDL files
+!*.vhd
