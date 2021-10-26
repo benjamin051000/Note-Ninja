@@ -1,7 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.vga_lib.all;
 
 entity double_frame_buf is
     port (
@@ -50,7 +49,7 @@ begin
 
     -- Instantiate RAM
     U_RAM_A : entity work.frame_buffer_ram
-        generic map(name => "./a.mif")
+        generic map(name => "./vram.mif")
         port map (
             clock => clk,
             address => addr_a,
@@ -60,7 +59,7 @@ begin
         );
 
     U_RAM_B : entity work.frame_buffer_ram
-        generic map(name => "./b.mif")
+        generic map(name => "./vram.mif")
         port map (
             clock => clk,
             address => addr_b,
