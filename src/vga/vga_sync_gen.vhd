@@ -1,7 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.vga_lib.all;
+use work.vgalib_640x480_60.all;
 
 
 entity vga_sync_gen is
