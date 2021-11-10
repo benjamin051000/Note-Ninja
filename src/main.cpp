@@ -10,16 +10,6 @@
 
 #include "MIDI_MSP.h"
 
-
-void test_31250_baud() {
-    back_channel_31250_init();
-
-    BackChannelPrint("If you can read this, it works properly.", BackChannel_Info);
-
-    BackChannelInit(); // Reset back channel UART baud rate
-}
-
-
 /**
  * Report clock information
  * via UART.
@@ -110,13 +100,8 @@ void main()
 
 
 	while(true) {
-
-	    // TODO: Does this block? It probably does, for async you'd use an interrupt
-//	    uint8_t rx = UART_receiveData(EUSCI_A1_BASE);
 	    MIDI.read();
-
-//	    DelayMs(1000);
-
 	}
 }
+
 

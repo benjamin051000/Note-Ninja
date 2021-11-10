@@ -27,9 +27,10 @@ namespace {
 
 
 /**
- * Param baudRate is ignored, as it is internaly handled and will always be 31250.
+ * Param baudRate is ignored, as it is internally handled and will always be 31250.
  */
 void MSPSerial::begin(long baudRate) {
+
     /* Select GPIO functionality */
     // P2.2 is UART RX. We don't need TX because we are only receiving MIDI.
     MAP_GPIO_setAsPeripheralModuleFunctionInputPin(
@@ -37,9 +38,6 @@ void MSPSerial::begin(long baudRate) {
             GPIO_PIN2,
             GPIO_PRIMARY_MODULE_FUNCTION
     );
-
-    /* Configure digital oscillator */
-//    CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_12);
 
     /* Configure UART with 31250 baud rate */
     MAP_UART_initModule(EUSCI_A1_BASE, &UART_cfg_31250);
@@ -51,7 +49,7 @@ void MSPSerial::begin(long baudRate) {
 void MSPSerial::end() {}
 
 void MSPSerial::write(byte value) {
-    return; // We will not be writing via this.
+    return; // We will not be writing from this module.
 }
 
 byte MSPSerial::read() {
@@ -60,6 +58,7 @@ byte MSPSerial::read() {
 
 unsigned MSPSerial::available() {
 //    return UART_queryStatusFlags(EUSCI_A1_BASE, EUSCI_A_UART_BUSY);
+    // Return true for now, as it seems to work just fine.
     return true;
 }
 
