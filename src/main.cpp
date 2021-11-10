@@ -8,13 +8,15 @@
 
 #include "uart.h"
 
+#include "MIDI_MSP.h"
+
 
 void test_31250_baud() {
     back_channel_31250_init();
 
     BackChannelPrint("If you can read this, it works properly.", BackChannel_Info);
 
-    BSP_InitBoard(); // Reset back channel UART baud rate
+    BackChannelInit(); // Reset back channel UART baud rate
 }
 
 
@@ -56,19 +58,64 @@ void report_clk_info() {
 }
 
 
+void NoteOnHandler(byte channel, byte pitch, byte velocity) {
+    char msg[255];
+    sprintf(msg, "Note On  (Channel: %d, Pitch: %d, Velocity: %d)",
+            (int)channel,
+            (int)pitch,
+            (int)velocity
+    );
+
+    BackChannelPrint(msg, BackChannel_Info);
+}
+
+void NoteOffHandler(byte channel, byte pitch, byte velocity) {
+    char msg[255];
+    sprintf(msg, "Note Off (Channel: %d, Pitch: %d, Velocity: %d)",
+            (int)channel,
+            (int)pitch,
+            (int)velocity
+    );
+
+    BackChannelPrint(msg, BackChannel_Info);
+}
+
+
 void main()
 {
     // Initialize clock source & back channel UART
     BSP_InitBoard();
 
+    // Create MIDI instance
+    MSPSerial MSPSerialObj;
+    MIDI_CREATE_INSTANCE(MSPSerial, MSPSerialObj, MIDI);
+
 	report_clk_info();
 
-//    test_31250_baud();
+//	midi_uart_1_init();
+
+
+	MIDI.setHandleNoteOn(NoteOnHandler);
+	MIDI.setHandleNoteOff(NoteOffHandler);
+	MIDI.begin(MIDI_CHANNEL_OMNI);
+
+//	char msg[128];
+
+//	while(true) {
+//	    byte rx = UART_receiveData(EUSCI_A1_BASE);
+//
+//	    sprintf(msg, "%c", rx);
+//	    BackChannelPrint(msg, BackChannel_Info);
+//	}
+
 
 	while(true) {
 
-	    BackChannelPrint("Hello!", BackChannel_Info);
-	    DelayMs(10000); // 10s
+	    // TODO: Does this block? It probably does, for async you'd use an interrupt
+//	    uint8_t rx = UART_receiveData(EUSCI_A1_BASE);
+	    MIDI.read();
+
+//	    DelayMs(1000);
 
 	}
 }
