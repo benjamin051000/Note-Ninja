@@ -12,7 +12,9 @@ entity vga_top is
 		swap_complete : out std_logic; 
 		
 		-- Address and data lines for incoming data from CPU to the back buffer.
-		wraddr, data : in std_logic_vector(11 downto 0);
+		wraddr : in std_logic_vector(13 downto 0);
+		data : in std_logic_vector(11 downto 0);
+
 		back_buf_wren : in std_logic;
 		
 		-- Output signals to the display.

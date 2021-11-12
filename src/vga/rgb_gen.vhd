@@ -13,7 +13,8 @@ port (
 
 	cpu_says_swap_buf : in std_logic;
 	swap_complete : out std_logic;
-	wraddr, data : in std_logic_vector(11 downto 0);
+	wraddr : in std_logic_vector(13 downto 0);
+	data : in std_logic_vector(11 downto 0);
 	back_buf_wren : in std_logic;
 	
 	r, g, b : out std_logic_vector(3 downto 0)
@@ -23,7 +24,8 @@ end rgb_gen;
 
 architecture bhv of rgb_gen is
 	
-	signal readaddr, q : std_logic_vector(11 downto 0);
+	signal readaddr : std_logic_vector(13 downto 0);
+	signal q : std_logic_vector(11 downto 0);
 	signal location : natural;
 	signal en : std_logic;
 	signal u_vcnt, u_hcnt, row_offset, col_offset, row, col : unsigned(9 downto 0);
@@ -58,9 +60,9 @@ begin
 
 
 	-- Generate VRAM readaddr from row and column.
-	row <= shift_right((u_vcnt - row_offset), 1);
-	col <= shift_right((u_hcnt - col_offset), 1); -- Change to unsigned.
-	readaddr <= std_logic_vector(row(5 downto 0) & col(5 downto 0));
+	row <= u_vcnt - row_offset;
+	col <= u_hcnt - col_offset;
+	readaddr <= std_logic_vector(row(6 downto 0) & col(6 downto 0));
 	
 
 	process(u_vcnt, u_hcnt)

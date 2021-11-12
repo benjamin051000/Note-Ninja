@@ -8,7 +8,8 @@ entity double_frame_buf is
         -- readAddr: Address read from front buffer that goes to monitor.
         -- wrAddr: Address CPU writes data to in back buffer.
         -- data: data from CPU written into back buffer at wrAddr.
-        readAddr, wrAddr, wrData : in std_logic_vector(11 downto 0);
+        readAddr, wrAddr : in std_logic_vector(13 downto 0);
+        wrData : in std_logic_vector(11 downto 0);
 
         -- When the CPU is writing to the back buffer, set this flag.
         back_buf_wren : in std_logic;
@@ -33,7 +34,8 @@ end double_frame_buf;
 
 architecture bhv of double_frame_buf is
 
-    signal addr_a, addr_b, readData_a, readData_b : std_logic_vector(11 downto 0);
+    signal addr_a, addr_b : std_logic_vector(13 downto 0);
+    signal readData_a, readData_b : std_logic_vector(11 downto 0);
     signal wren_a, wren_b : std_logic;
 
     -- Signals to tell when to swap frames, and when to alert cpu it's done.
@@ -48,8 +50,8 @@ architecture bhv of double_frame_buf is
 begin
 
     -- Instantiate RAM
-    U_RAM_A : entity work.frame_buffer_ram
-        generic map(name => "./vram.mif")
+    U_RAM_A : entity work.frame_buf_ram_128
+        -- generic map(name => "./brom128.mif")
         port map (
             clock => clk,
             address => addr_a,
@@ -58,8 +60,8 @@ begin
             q => readData_a
         );
 
-    U_RAM_B : entity work.frame_buffer_ram
-        generic map(name => "./vram.mif")
+    U_RAM_B : entity work.frame_buf_ram_128
+        -- generic map(name => "./brom128.mif")
         port map (
             clock => clk,
             address => addr_b,
