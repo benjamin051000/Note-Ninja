@@ -64,7 +64,7 @@ void midi_uart_2_init(void) {
 /* Initializes back channel UART at 31250 baud (to test settings). */
 void back_channel_31250_init(void)
 {
-    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, GPIO_PIN2 | GPIO_PIN3, GPIO_PRIMARY_MODULE_FUNCTION);
+    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, GPIO_PIN2 | GPIO_PIN3, GPIO_PRIMARY_MODULE_FUNCTION); // TODO shouldn't TX be Output func? It still works...
     MAP_UART_initModule(EUSCI_A0_BASE, &UART_cfg_31250);
     MAP_UART_enableModule(EUSCI_A0_BASE);
 }
