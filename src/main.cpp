@@ -76,13 +76,22 @@ void main()
     // Initialize clock source & back channel UART
     BSP_InitBoard();
 
+    report_clk_info();
+
+    GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN7);
+
+    while(1) {
+        GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN7);
+        DelayMs(100);
+        GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN7);
+        DelayMs(500);
+    }
+
     // Create MIDI instance
     MSPSerial MSPSerialObj;
     MIDI_CREATE_INSTANCE(MSPSerial, MSPSerialObj, MIDI);
 
-	report_clk_info();
-
-//	midi_uart_1_init();
+    //	midi_uart_1_init();
 
 
 	MIDI.setHandleNoteOn(NoteOnHandler);
