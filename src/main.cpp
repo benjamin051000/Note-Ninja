@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "main.h"
+
 #include "msp.h"
 #include "BSP.h"
 #include "demo_sysctl.h"
@@ -47,66 +49,67 @@ void report_clk_info() {
     BackChannelPrint(msg, BackChannel_Info);
 }
 
+void led_blink_test() {
+    while(1) {
+        GPIO_setOutputHighOnPin(GPIO_PORT_P1, LED_ONBOARD);
+        DelayMs(1000);
+        GPIO_setOutputLowOnPin(GPIO_PORT_P1, LED_ONBOARD);
+        DelayMs(1000);
+    }
+}
 
 void NoteOnHandler(byte channel, byte pitch, byte velocity) {
     char msg[255];
-    sprintf(msg, "Note On  (Channel: %d, Pitch: %d, Velocity: %d)",
+    snprintf(msg, 255, "Note On  (Channel: %d, Pitch: %d, Velocity: %d)",
             (int)channel,
             (int)pitch,
             (int)velocity
     );
 
     BackChannelPrint(msg, BackChannel_Info);
+
+    GPIO_setOutputHighOnPin(GPIO_PORT_P1, LED_ONBOARD);
 }
 
 void NoteOffHandler(byte channel, byte pitch, byte velocity) {
     char msg[255];
-    sprintf(msg, "Note Off (Channel: %d, Pitch: %d, Velocity: %d)",
+    snprintf(msg, 255, "Note Off (Channel: %d, Pitch: %d, Velocity: %d)",
             (int)channel,
             (int)pitch,
             (int)velocity
     );
 
     BackChannelPrint(msg, BackChannel_Info);
+
+    GPIO_setOutputLowOnPin(GPIO_PORT_P1, LED_ONBOARD);
 }
 
 
-void main()
-{
-    // Initialize clock source & back channel UART
-    BSP_InitBoard();
+void main() {
+    // Run applicable functions of BSP_InitBoard
+    /* Disable Watchdog */
+    WDT_A_clearTimer();
+    WDT_A_holdTimer();
+
+#ifdef TARGET_PCB
+    UART::back_channel_pcb_init();
+#else
+    ClockSys_SetMaxFreq();
+    BackChannelInit();
+#endif
 
     report_clk_info();
 
-    GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN7);
+    // Set up onboard LED
+    GPIO_setAsOutputPin(GPIO_PORT_P1, LED_ONBOARD);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P1, LED_ONBOARD);
 
-    while(1) {
-        GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN7);
-        DelayMs(100);
-        GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN7);
-        DelayMs(500);
-    }
+    MIDI_CREATE_PCB_INSTANCE();
 
-    // Create MIDI instance
-    MSPSerial MSPSerialObj;
-    MIDI_CREATE_INSTANCE(MSPSerial, MSPSerialObj, MIDI);
-
-    //	midi_uart_1_init();
-
-
+    // Set MIDI callback functions
 	MIDI.setHandleNoteOn(NoteOnHandler);
 	MIDI.setHandleNoteOff(NoteOffHandler);
 	MIDI.begin(MIDI_CHANNEL_OMNI);
-
-//	char msg[128];
-
-//	while(true) {
-//	    byte rx = UART_receiveData(EUSCI_A1_BASE);
-//
-//	    sprintf(msg, "%c", rx);
-//	    BackChannelPrint(msg, BackChannel_Info);
-//	}
-
 
 	while(true) {
 	    MIDI.read();

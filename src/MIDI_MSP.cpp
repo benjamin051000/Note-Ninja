@@ -5,14 +5,33 @@
  *      Author: benja
  */
 #include "MIDI_MSP.h"
+#include "main.h"
 #include <driverlib.h>
 
 
 namespace {
-    /* Configuration for a MIDI-compatible UART at 31250 baud. */
-    const eUSCI_UART_Config UART_cfg_31250 = {
+    /* Configuration for a MIDI-compatible UART at 31250 baud.
+     * Uses a 12 MHz SMCLK.
+     */
+    const eUSCI_UART_Config UART_cfg_31250_12MHz = {
         EUSCI_A_UART_CLOCKSOURCE_SMCLK,
         24, // BRDIV
+        0, // UCxBRF
+        0, // UCxBRS
+        EUSCI_A_UART_NO_PARITY,
+        EUSCI_A_UART_LSB_FIRST,
+        EUSCI_A_UART_ONE_STOP_BIT,
+        EUSCI_A_UART_MODE, // UART mode
+        EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION // Oversampling
+    };
+
+    /**
+     * Config for a MIDI-compliant UART input at 31250 baud.
+     * Uses a 3MHz SMCLK.
+     */
+    const eUSCI_UART_Config UART_cfg_31250_3MHz = {
+        EUSCI_A_UART_CLOCKSOURCE_SMCLK,
+        6, // BRDIV
         0, // UCxBRF
         0, // UCxBRS
         EUSCI_A_UART_NO_PARITY,
@@ -40,7 +59,11 @@ void MSPSerial::begin(long baudRate) {
     );
 
     /* Configure UART with 31250 baud rate */
-    MAP_UART_initModule(EUSCI_A1_BASE, &UART_cfg_31250);
+#ifdef TARGET_PCB
+    MAP_UART_initModule(EUSCI_A1_BASE, &UART_cfg_31250_3MHz);
+#else
+    MAP_UART_initModule(EUSCI_A1_BASE, &UART_cfg_31250_12MHz);
+#endif
 
     /* Enable UART */
     MAP_UART_enableModule(EUSCI_A1_BASE);

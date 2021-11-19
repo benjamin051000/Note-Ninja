@@ -5,9 +5,13 @@
  *      Author: benja
  */
 
-#ifndef SRC_MIDI_MSP_H_
-#define SRC_MIDI_MSP_H_
+#pragma once
 #include "MIDI.h"
+
+#define MIDI_CREATE_PCB_INSTANCE() \
+    MSPSerial MSPSerialObj; \
+    MIDI_CREATE_INSTANCE(MSPSerial, MSPSerialObj, MIDI);
+
 
 /**
  * MSPSerial
@@ -49,6 +53,3 @@ public:
      */
     unsigned available();
 };
-
-
-#endif /* SRC_MIDI_MSP_H_ */

@@ -18,7 +18,7 @@ void BSP_InitBoard()
 	WDT_A_holdTimer();
 
 	/* Initialize Clock */
-    ClockSys_SetMaxFreq();
+//    ClockSys_SetMaxFreq();
 
 	/* Init i2c */
 //	initI2C();
@@ -39,7 +39,7 @@ void BSP_InitBoard()
 	//bme280_initialize_sensor();
 
 	/* Init BackChannel UART */
-	BackChannelInit();
+//	BackChannelInit();
 
 	/* Init RGB LEDs */
 //	init_RGBLeds();
