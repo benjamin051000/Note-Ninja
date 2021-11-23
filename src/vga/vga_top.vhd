@@ -7,15 +7,15 @@ entity vga_top is
 
 		-- Signals for receiving VRAM data from CPU
 		-- Instruction from CPU that the buffer is done and ready to be swapped.
-		cpu_says_swap_buf : in std_logic; 
+		-- cpu_says_swap_buf : in std_logic; 
 		-- Flag for CPU once buffers have been swapped.
-		swap_complete : out std_logic; 
+		-- swap_complete : out std_logic; 
 		
 		-- Address and data lines for incoming data from CPU to the back buffer.
-		wraddr : in std_logic_vector(13 downto 0);
-		data : in std_logic_vector(11 downto 0);
+		-- wraddr : in std_logic_vector(18 downto 0);
+		-- data : in std_logic_vector(11 downto 0);
 
-		back_buf_wren : in std_logic;
+		-- back_buf_wren : in std_logic;
 		
 		-- Output signals to the display.
 		vga_hsync, vga_vsync : out std_logic;
@@ -58,12 +58,12 @@ begin -- STR
 			clk => clk,
 			rst => rst,
 
-			cpu_says_swap_buf => cpu_says_swap_buf,
-			swap_complete => swap_complete,
-			wraddr => wraddr,
-			data => data,
-			back_buf_wren => back_buf_wren,
-			vsync => vsync_signal,
+			-- cpu_says_swap_buf => cpu_says_swap_buf,
+			-- swap_complete => swap_complete,
+			-- wraddr => wraddr,
+			-- data => data,
+			-- back_buf_wren => back_buf_wren,
+			-- vsync => vsync_signal,
 
 
 			video_on => video_on,
