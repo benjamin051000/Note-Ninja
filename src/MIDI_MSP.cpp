@@ -59,11 +59,11 @@ void MSPSerial::begin(long baudRate) {
     );
 
     /* Configure UART with 31250 baud rate */
-#ifdef TARGET_PCB
+//#ifdef TARGET_PCB
     MAP_UART_initModule(EUSCI_A1_BASE, &UART_cfg_31250_3MHz);
-#else
-    MAP_UART_initModule(EUSCI_A1_BASE, &UART_cfg_31250_12MHz);
-#endif
+//#else
+//    MAP_UART_initModule(EUSCI_A1_BASE, &UART_cfg_31250_12MHz);
+//#endif
 
     /* Enable UART */
     MAP_UART_enableModule(EUSCI_A1_BASE);

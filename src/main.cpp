@@ -50,10 +50,8 @@ void report_clk_info() {
 }
 
 void led_blink_test() {
-    while(1) {
-        GPIO_setOutputHighOnPin(GPIO_PORT_P1, LED_ONBOARD);
-        DelayMs(1000);
-        GPIO_setOutputLowOnPin(GPIO_PORT_P1, LED_ONBOARD);
+    while(true) {
+        GPIO_toggleOutputOnPin(GPIO_PORT_P1, LED_ONBOARD);
         DelayMs(1000);
     }
 }
@@ -91,20 +89,25 @@ void main() {
     WDT_A_clearTimer();
     WDT_A_holdTimer();
 
-#ifdef TARGET_PCB
+//#ifdef TARGET_PCB
     UART::back_channel_pcb_init();
-#else
-    ClockSys_SetMaxFreq();
-    BackChannelInit();
-#endif
+//#else
+////    ClockSys_SetMaxFreq();
+////    BackChannelInit();
+//#endif
 
     report_clk_info();
+
+
 
     // Set up onboard LED
     GPIO_setAsOutputPin(GPIO_PORT_P1, LED_ONBOARD);
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, LED_ONBOARD);
 
+//    led_blink_test();
+
     MIDI_CREATE_PCB_INSTANCE();
+
 
     // Set MIDI callback functions
 	MIDI.setHandleNoteOn(NoteOnHandler);
@@ -115,5 +118,3 @@ void main() {
 	    MIDI.read();
 	}
 }
-
-
