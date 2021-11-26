@@ -12,6 +12,10 @@
 
 #include "MIDI_MSP.h"
 
+#include <albertOS.h>
+
+MIDI_CREATE_PCB_INSTANCE();
+
 /**
  * Report clock information
  * via UART.
@@ -52,7 +56,7 @@ void report_clk_info() {
 void led_blink_test() {
     while(true) {
         GPIO_toggleOutputOnPin(GPIO_PORT_P1, LED_ONBOARD);
-        DelayMs(1000);
+        albertOS::sleep(1000);
     }
 }
 
@@ -82,12 +86,30 @@ void NoteOffHandler(byte channel, byte pitch, byte velocity) {
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, LED_ONBOARD);
 }
 
+void idle() {
+    while(true);
+}
+
+void midi_read() {
+//while(true) {
+    MIDI.read();
+    DelayMs(2); // do we get here?
+//    albertOS::sleep(2); // allow other threads to run
+//}
+}
+
+void blink_rgb() {
+while(true) {
+    GPIO_toggleOutputOnPin(GPIO_PORT_P2, GPIO_PIN1);
+    albertOS::sleep(1000);
+}
+}
 
 void main() {
     // Run applicable functions of BSP_InitBoard
     /* Disable Watchdog */
-    WDT_A_clearTimer();
-    WDT_A_holdTimer();
+//    WDT_A_clearTimer();
+//    WDT_A_holdTimer();
 
 //#ifdef TARGET_PCB
     UART::back_channel_pcb_init();
@@ -104,9 +126,11 @@ void main() {
     GPIO_setAsOutputPin(GPIO_PORT_P1, LED_ONBOARD);
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, LED_ONBOARD);
 
-//    led_blink_test();
+    // Set up RGB LED
+    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1);
 
-    MIDI_CREATE_PCB_INSTANCE();
+//    led_blink_test();
 
 
     // Set MIDI callback functions
@@ -114,7 +138,16 @@ void main() {
 	MIDI.setHandleNoteOff(NoteOffHandler);
 	MIDI.begin(MIDI_CHANNEL_OMNI);
 
-	while(true) {
-	    MIDI.read();
-	}
+	while(true) midi_read();
+//	albertOS::init();
+//
+//	albertOS::addThread(idle, 255, (char*)"Idle");
+//
+//	albertOS::addThread(blink_rgb, 2, (char*)"rgb blink");
+
+//	albertOS::addAPeriodicEvent(midi_read, 1, "midi read");
+//	albertOS::addPeriodicEvent(midi_read, 2);
+//	albertOS::addThread(midi_read, 1, (char*)"midi read");
+
+//	albertOS::launch();
 }

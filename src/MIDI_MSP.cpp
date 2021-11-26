@@ -80,7 +80,7 @@ byte MSPSerial::read() {
 }
 
 unsigned MSPSerial::available() {
-//    return UART_queryStatusFlags(EUSCI_A1_BASE, EUSCI_A_UART_BUSY);
+    return ! UART_queryStatusFlags(EUSCI_A1_BASE, EUSCI_A_UART_BUSY);
     // Return true for now, as it seems to work just fine.
     return true;
 }
