@@ -61,14 +61,6 @@ set_global_assignment -name TIMING_ANALYZER_MULTICORNER_ANALYSIS ON
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_global_assignment -name VHDL_FILE src/clk_div.vhd
-set_global_assignment -name VHDL_FILE src/vga/vga_top.vhd
-set_global_assignment -name VHDL_FILE src/vga/vga_sync_gen.vhd
-set_global_assignment -name VHDL_FILE src/vga/vga_lib.vhd
-set_global_assignment -name VHDL_FILE src/vga/rgb_gen.vhd
-set_global_assignment -name VHDL_FILE src/vga/frame_buffer_ram.vhd
-set_global_assignment -name VHDL_FILE src/vga/double_frame_buf.vhd
-set_global_assignment -name VHDL_FILE src/Graphics_Processor.vhd
 set_location_assignment PIN_A7 -to button[1]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to button[1]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to button[0]
@@ -215,8 +207,17 @@ set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -
 set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -fall
 set_global_assignment -name EXTERNAL_FLASH_FALLBACK_ADDRESS 00000000
 set_global_assignment -name INTERNAL_FLASH_UPDATE_MODE "SINGLE IMAGE WITH ERAM"
-set_global_assignment -name QIP_FILE src/pll108M.qip
 set_location_assignment PIN_B8 -to rst_l
+set_global_assignment -name VHDL_FILE src/vga/note.vhd
+set_global_assignment -name VHDL_FILE src/clk_div.vhd
+set_global_assignment -name VHDL_FILE src/vga/vga_top.vhd
+set_global_assignment -name VHDL_FILE src/vga/vga_sync_gen.vhd
+set_global_assignment -name VHDL_FILE src/vga/vga_lib.vhd
+set_global_assignment -name VHDL_FILE src/vga/rgb_gen.vhd
+set_global_assignment -name VHDL_FILE src/vga/frame_buffer_ram.vhd
+set_global_assignment -name VHDL_FILE src/vga/double_frame_buf.vhd
+set_global_assignment -name VHDL_FILE src/Graphics_Processor.vhd
+set_global_assignment -name QIP_FILE src/pll108M.qip
 set_global_assignment -name QIP_FILE src/vga/frame_buf_ram_128.qip
 set_global_assignment -name QIP_FILE src/vga/ram_buf_640x480.qip
 set_global_assignment -name QIP_FILE src/vga/frame_buf_640x480.qip

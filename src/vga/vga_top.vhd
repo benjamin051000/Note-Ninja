@@ -30,7 +30,10 @@ architecture STR of vga_top is
 	signal button_n : std_logic_vector(1 downto 0);
 
 	-- VGA signals
-	signal hcount, vcount : std_logic_vector(9 downto 0);
+	-- signal hcount, vcount : std_logic_vector(9 downto 0);
+	signal hcount : natural range 0 to 640;
+    signal vcount : natural range 0 to 480;
+
 	signal video_on : std_logic;
 	signal vsync_signal : std_logic;
 
@@ -43,8 +46,8 @@ begin -- STR
 		port map(
 			clk => clk,
 			rst => rst,
-			Hcount => hcount,
-			Vcount => vcount,
+			hcount => hcount,
+			vcount => vcount,
 			hsync => vga_hsync,
 			vsync => vsync_signal,
 			video_on => video_on

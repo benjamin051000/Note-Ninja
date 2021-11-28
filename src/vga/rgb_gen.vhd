@@ -6,7 +6,9 @@ use work.vgalib_640x480_60.all;
 
 entity rgb_gen is
 port (
-	vcount, hcount : in std_logic_vector(9 downto 0);
+	-- vcount, hcount : in std_logic_vector(9 downto 0);
+	hcount : in natural range 0 to 640;
+    vcount : in natural range 0 to 480;
 	-- video_on and vsync controlled by sync gen
 	-- video_on, vsync : in std_logic;
 	video_on : in std_logic;
@@ -31,12 +33,64 @@ architecture bhv of rgb_gen is
 	-- signal en : std_logic;
 	-- signal u_vcnt, u_hcnt, row_offset, col_offset, row, col : unsigned(9 downto 0);
 	
+	signal new_x, new_y : integer range 0 to 640;
+
+    signal color: std_logic_vector(11 downto 0); -- 12 bits for R,G,B out
+
+	signal count : natural range 0 to 50000;
+
+	signal update_note : std_logic;
+
 begin
 
-	r <= "1111" when (video_on = '1' and to_integer(unsigned(vcount)) - to_integer(unsigned(hcount)) >= 75) else "0000";
-	g <= "1111" when (video_on = '1' and to_integer(unsigned(vcount)) - to_integer(unsigned(hcount)) < 100) else "0000";
-	b <= "1111" when (video_on = '1' and unsigned(vcount) < unsigned(hcount)) else "0000";
+	-- r <= "1111" when (video_on = '1' and vcount - hcount >= 75) else "0000";
+	-- g <= "1111" when (video_on = '1' and vcount - hcount < 100) else "0000";
+	-- b <= "1111" when video_on = '1' and vcount < hcount else "0000";
+	r <= color(11 downto 8);
+	g <= color(7 downto 4);
+	b <= color(3 downto 0);
 	
+
+	-- for testing
+	U_NOTE: entity work.note
+	generic map(
+		w => 50,
+		h => 25
+	)
+	port map(
+		vcount => vcount,
+		hcount => hcount,
+		
+		clk => clk,
+		rst => rst,
+		
+		update => update_note,
+		new_x => new_x,
+		new_y => new_y,
+
+		color => color
+	);
+
+	-- a simple counter to move the note around.
+	process(clk, rst)
+	begin
+		if(rst = '1')then
+			count <= 0;
+			new_x <= 0;
+			new_y <= 0;
+		elsif(rising_edge(clk)) then
+			count <= count + 1;
+
+			update_note <= '0';
+
+			if(count = 50000) then
+				new_x <= new_x + 1;
+				new_y <= new_y + 1;
+				update_note <= '1';
+			end if;
+		end if;
+	end process;
+
 	-- Instantiate frame buffer
 	-- U_FRAME_BUF : entity work.double_frame_buf
 	-- 	port map (
