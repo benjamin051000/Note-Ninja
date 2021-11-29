@@ -91,11 +91,11 @@ void idle() {
 }
 
 void midi_read() {
-//while(true) {
+while(true) {
     MIDI.read();
-    DelayMs(2); // do we get here?
-//    albertOS::sleep(2); // allow other threads to run
-//}
+//    DelayMs(2); // do we get here?
+    albertOS::sleep(2); // allow other threads to run
+}
 }
 
 void blink_rgb() {
@@ -108,14 +108,14 @@ while(true) {
 void main() {
     // Run applicable functions of BSP_InitBoard
     /* Disable Watchdog */
-//    WDT_A_clearTimer();
-//    WDT_A_holdTimer();
+    WDT_A_clearTimer();
+    WDT_A_holdTimer();
 
 //#ifdef TARGET_PCB
     UART::back_channel_pcb_init();
 //#else
-////    ClockSys_SetMaxFreq();
-////    BackChannelInit();
+//    ClockSys_SetMaxFreq();
+//    BackChannelInit();
 //#endif
 
     report_clk_info();
@@ -136,18 +136,22 @@ void main() {
     // Set MIDI callback functions
 	MIDI.setHandleNoteOn(NoteOnHandler);
 	MIDI.setHandleNoteOff(NoteOffHandler);
-	MIDI.begin(MIDI_CHANNEL_OMNI);
+	MIDI.begin(1);
 
-	while(true) midi_read();
+	while(true) MIDI.read();
+
+
 //	albertOS::init();
 //
 //	albertOS::addThread(idle, 255, (char*)"Idle");
 //
 //	albertOS::addThread(blink_rgb, 2, (char*)"rgb blink");
-
-//	albertOS::addAPeriodicEvent(midi_read, 1, "midi read");
-//	albertOS::addPeriodicEvent(midi_read, 2);
+//
+////	albertOS::addPeriodicEvent([](){
+////	    MIDI.read();
+////	}, 2);
+//
 //	albertOS::addThread(midi_read, 1, (char*)"midi read");
-
+//
 //	albertOS::launch();
 }

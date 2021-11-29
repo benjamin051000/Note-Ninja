@@ -76,13 +76,20 @@ void MSPSerial::write(byte value) {
 }
 
 byte MSPSerial::read() {
-    return UART_receiveData(EUSCI_A1_BASE);
+    return UART_receiveData(EUSCI_A1_BASE); // TODO this blocks and can't block. Read the register yourself
+
+//    if(UCA1IFG) {
+//        return (byte) UCA1RXBUF;
+//    }
+
+    return 0;
+
 }
 
 unsigned MSPSerial::available() {
     return ! UART_queryStatusFlags(EUSCI_A1_BASE, EUSCI_A_UART_BUSY);
     // Return true for now, as it seems to work just fine.
-    return true;
+//    return true;
 }
 
 
