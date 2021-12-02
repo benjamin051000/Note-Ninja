@@ -82,7 +82,7 @@ byte MSPSerial::read() {
 //        return (byte) UCA1RXBUF;
 //    }
 
-    return 0;
+//    return 0;
 
 }
 

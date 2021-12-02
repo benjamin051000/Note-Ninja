@@ -10,7 +10,7 @@
 
 #define MIDI_CREATE_PCB_INSTANCE() \
     MSPSerial MSPSerialObj; \
-    MIDI_CREATE_INSTANCE(MSPSerial, MSPSerialObj, MIDI);
+    MIDI_CREATE_CUSTOM_INSTANCE(MSPSerial, MSPSerialObj, MIDI, MIDI_PCB_SETTINGS);
 
 
 /**
@@ -52,4 +52,12 @@ public:
      * (Note: Always returns true, which may be bad)
      */
     unsigned available();
+};
+
+struct MIDI_PCB_SETTINGS : public midi::DefaultSettings {
+    /*! Global switch to turn on/off receiver ActiveSensing
+    Set to true to check for message timeouts (via ErrorCallback)
+    Set to false will not check if chained device are still alive (if they use ActiveSensing) (will also save memory)
+    */
+    static const bool UseReceiverActiveSensing = true;
 };

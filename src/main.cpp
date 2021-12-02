@@ -60,6 +60,9 @@ void led_blink_test() {
     }
 }
 
+/////////////////////////////////////////////
+// MIDI callback functions
+/////////////////////////////////////////////
 void NoteOnHandler(byte channel, byte pitch, byte velocity) {
     char msg[255];
     snprintf(msg, 255, "Note On  (Channel: %d, Pitch: %d, Velocity: %d)",
@@ -86,6 +89,27 @@ void NoteOffHandler(byte channel, byte pitch, byte velocity) {
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, LED_ONBOARD);
 }
 
+void ActiveSensingHandler() {
+    BackChannelPrint("Active sensing", BackChannel_Info);
+}
+
+void PitchBendHandler(byte channel, int val) {
+    char msg[255];
+    snprintf(msg, 255, "pitch bend: channel %d, val=%d",
+             (int)channel, val);
+    BackChannelPrint(msg, BackChannel_Info);
+}
+
+void MIDIErrorHandler(int8_t err) {
+    char msg[64];
+    snprintf(msg, 255, "ERROR: %d", (int)err);
+    BackChannelPrint(msg, BackChannel_Error);
+}
+
+
+/////////////////////////////////////////////
+// albertOS Threads
+/////////////////////////////////////////////
 void idle() {
     while(true);
 }
@@ -94,7 +118,7 @@ void midi_read() {
 while(true) {
     MIDI.read();
 //    DelayMs(2); // do we get here?
-    albertOS::sleep(2); // allow other threads to run
+//    albertOS::sleep(2); // allow other threads to run
 }
 }
 
@@ -111,12 +135,7 @@ void main() {
     WDT_A_clearTimer();
     WDT_A_holdTimer();
 
-//#ifdef TARGET_PCB
     UART::back_channel_pcb_init();
-//#else
-//    ClockSys_SetMaxFreq();
-//    BackChannelInit();
-//#endif
 
     report_clk_info();
 
@@ -136,22 +155,27 @@ void main() {
     // Set MIDI callback functions
 	MIDI.setHandleNoteOn(NoteOnHandler);
 	MIDI.setHandleNoteOff(NoteOffHandler);
-	MIDI.begin(1);
+//	MIDI.setHandleActiveSensing(ActiveSensingHandler);
+	MIDI.setHandlePitchBend(PitchBendHandler);
+	MIDI.setHandleError(MIDIErrorHandler);
 
-	while(true) MIDI.read();
+
+	MIDI.begin(); // Defaults to CH 1
+	MIDI.turnThruOff();
+
+//	while(true) MIDI.read();
 
 
-//	albertOS::init();
-//
-//	albertOS::addThread(idle, 255, (char*)"Idle");
-//
-//	albertOS::addThread(blink_rgb, 2, (char*)"rgb blink");
-//
-////	albertOS::addPeriodicEvent([](){
-////	    MIDI.read();
-////	}, 2);
-//
-//	albertOS::addThread(midi_read, 1, (char*)"midi read");
-//
-//	albertOS::launch();
+	albertOS::init();
+
+	albertOS::addThread(idle, 255, (char*)"Idle");
+
+
+//	albertOS::addPeriodicEvent([](){
+//	    MIDI.read();
+//	}, 2);
+
+	albertOS::addThread(midi_read, 1, (char*)"midi read");
+
+	albertOS::launch();
 }
