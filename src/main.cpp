@@ -106,6 +106,19 @@ void MIDIErrorHandler(int8_t err) {
     BackChannelPrint(msg, BackChannel_Error);
 }
 
+void midi_init() {
+    // Set MIDI callback functions
+    MIDI.setHandleNoteOn(NoteOnHandler);
+    MIDI.setHandleNoteOff(NoteOffHandler);
+//  MIDI.setHandleActiveSensing(ActiveSensingHandler);
+    MIDI.setHandlePitchBend(PitchBendHandler);
+    MIDI.setHandleError(MIDIErrorHandler);
+
+
+    MIDI.begin(); // Defaults to CH 1
+    MIDI.turnThruOff();
+}
+
 
 /////////////////////////////////////////////
 // albertOS Threads
@@ -139,29 +152,17 @@ void main() {
 
     report_clk_info();
 
-
+    midi_init();
 
     // Set up onboard LED
     GPIO_setAsOutputPin(GPIO_PORT_P1, LED_ONBOARD);
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, LED_ONBOARD);
 
     // Set up RGB LED
-    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1);
-
+//    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1);
+//    GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1);
 //    led_blink_test();
 
-
-    // Set MIDI callback functions
-	MIDI.setHandleNoteOn(NoteOnHandler);
-	MIDI.setHandleNoteOff(NoteOffHandler);
-//	MIDI.setHandleActiveSensing(ActiveSensingHandler);
-	MIDI.setHandlePitchBend(PitchBendHandler);
-	MIDI.setHandleError(MIDIErrorHandler);
-
-
-	MIDI.begin(); // Defaults to CH 1
-	MIDI.turnThruOff();
 
 //	while(true) MIDI.read();
 
