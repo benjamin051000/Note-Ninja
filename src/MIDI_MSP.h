@@ -59,5 +59,5 @@ struct MIDI_PCB_SETTINGS : public midi::DefaultSettings {
     Set to true to check for message timeouts (via ErrorCallback)
     Set to false will not check if chained device are still alive (if they use ActiveSensing) (will also save memory)
     */
-    static const bool UseReceiverActiveSensing = true;
+    static const bool UseReceiverActiveSensing = false;
 };

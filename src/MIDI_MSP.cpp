@@ -5,7 +5,7 @@
  *      Author: benja
  */
 #include "MIDI_MSP.h"
-#include "main.h"
+#include "main.h" // for TARGET_PCB preprocessor symbol
 #include <driverlib.h>
 
 
@@ -59,11 +59,11 @@ void MSPSerial::begin(long baudRate) {
     );
 
     /* Configure UART with 31250 baud rate */
-//#ifdef TARGET_PCB
+#ifdef TARGET_PCB
     MAP_UART_initModule(EUSCI_A1_BASE, &UART_cfg_31250_3MHz);
-//#else
-//    MAP_UART_initModule(EUSCI_A1_BASE, &UART_cfg_31250_12MHz);
-//#endif
+#else
+    MAP_UART_initModule(EUSCI_A1_BASE, &UART_cfg_31250_12MHz);
+#endif
 
     /* Enable UART */
     MAP_UART_enableModule(EUSCI_A1_BASE);
@@ -76,20 +76,23 @@ void MSPSerial::write(byte value) {
 }
 
 byte MSPSerial::read() {
+#if 1
     return UART_receiveData(EUSCI_A1_BASE); // TODO this blocks and can't block. Read the register yourself
+#else
+    if(UCA1IFG & EUSCI_A_IFG_RXIFG) {
+        return (byte) UCA1RXBUF; // Reading this reg automatically resets IFG
+    }
 
-//    if(UCA1IFG) {
-//        return (byte) UCA1RXBUF;
-//    }
-
-//    return 0;
+    return 0;
+#endif
 
 }
 
 unsigned MSPSerial::available() {
-    return ! UART_queryStatusFlags(EUSCI_A1_BASE, EUSCI_A_UART_BUSY);
-    // Return true for now, as it seems to work just fine.
-//    return true;
+    const auto result = !UART_queryStatusFlags(EUSCI_A1_BASE, EUSCI_A_UART_BUSY)
+            && (UCA1IFG & EUSCI_A_IFG_RXIFG);
+
+    return result;
 }
 
 

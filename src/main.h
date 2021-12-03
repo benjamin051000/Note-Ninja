@@ -15,11 +15,11 @@
  * To test the Launchpad, comment out the
  * define statement below.
  */
-#define TARGET_PCB
+//#define TARGET_PCB
 
 // Constants for the LED blink demo.
 #ifdef TARGET_PCB
-#define LED_ONBOARD GPIO_PIN7 // For PCB
+#define LED_ONBOARD GPIO_PIN7 // For PCB blue LED
 #else
-#define LED_ONBOARD GPIO_PIN0 // For launchpad
+#define LED_ONBOARD GPIO_PIN0 // For launchpad red LED
 #endif
