@@ -67,6 +67,9 @@ void MSPSerial::begin(long baudRate) {
 
     /* Enable UART */
     MAP_UART_enableModule(EUSCI_A1_BASE);
+
+    // Enable interrupt for Rx
+    MAP_UART_enableInterrupt(EUSCI_A1_BASE, EUSCI_A_UART_RECEIVE_INTERRUPT);
 }
 
 void MSPSerial::end() {}

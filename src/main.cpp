@@ -62,7 +62,7 @@ struct NoteStatus {
     uint32_t systemTime;
 };
 
-albertOS::FIFO<NoteStatus> note_on_fifo, note_off_fifo;
+albertOS::FIFO<NoteStatus, 16> note_on_fifo, note_off_fifo;
 
 Semaphore backchannel_uart_mutex;
 
@@ -187,6 +187,28 @@ void blink_led() {
     }
 }
 
+
+/////////////////////////////////////////////////////////////////
+// Event threads
+/////////////////////////////////////////////////////////////////
+albertOS::FIFO<uint8_t, 64> uartFIFO;
+
+void uart_handler() {
+    const auto value = UCA1RXBUF;
+    // Ignore ActiveSensing signals.
+    if(value != 0xFE) {
+        uartFIFO.write(value);
+        albertOS::waitSemaphore(backchannel_uart_mutex);
+
+        char msg[32];
+        sprintf(msg, "UART: %Xh", value);
+        BackChannelPrint(msg, BackChannel_Info);
+
+        albertOS::signalSemaphore(backchannel_uart_mutex);
+    }
+}
+
+
 void main() {
 #ifdef TARGET_PCB
     UART::back_channel_pcb_init();
@@ -204,11 +226,15 @@ void main() {
 	albertOS::init();
 
 	albertOS::initSemaphore(backchannel_uart_mutex, 1);
-	albertOS::addThread(debug_note_on, 1, (char*)"debug note on");
-	albertOS::addThread(debug_note_off, 1, (char*)"debug note off");
+//	albertOS::addThread(debug_note_on, 1, (char*)"debug note on");
+//	albertOS::addThread(debug_note_off, 1, (char*)"debug note off");
 
-	albertOS::addThread(midi_read, 1, (char*)"midi read");
+//	albertOS::addThread(midi_read, 1, (char*)"midi read");
 	albertOS::addThread(blink_led, 1, (char*)"blink led");
+
+	// Enable UART RX as an aperiodic event.
+	albertOS::addAPeriodicEvent(uart_handler, 1, EUSCIA1_IRQn);
+
 //	albertOS::addPeriodicEvent(midi_read_once, 1); // WARNING: Doesn't work if uart read blocks!
 //	albertOS::addAPeriodicEvent(midi_read_once, 1, EUSCIA1_IRQn);
 

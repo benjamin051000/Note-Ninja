@@ -15,7 +15,7 @@
  * To test the Launchpad, comment out the
  * define statement below.
  */
-//#define TARGET_PCB
+#define TARGET_PCB
 
 // Constants for the LED blink demo.
 #ifdef TARGET_PCB
