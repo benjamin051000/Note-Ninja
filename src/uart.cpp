@@ -1,5 +1,7 @@
 #include "uart.h"
 #include <driverlib.h>
+#include <albertOS.h>
+#include "main.h"
 
 // Local namespace
 namespace {
@@ -18,63 +20,45 @@ const eUSCI_UART_Config UART_cfg_115200_3MHz = {
 
 
 /* Configuration for a MIDI-compatible UART at 31250 baud. */
-const eUSCI_UART_Config UART_cfg_31250 = {
-    EUSCI_A_UART_CLOCKSOURCE_SMCLK,
-    24, // BRDIV
-    0, // UCxBRF
-    0, // UCxBRS
-    EUSCI_A_UART_NO_PARITY,
-    EUSCI_A_UART_LSB_FIRST,
-    EUSCI_A_UART_ONE_STOP_BIT,
-    EUSCI_A_UART_MODE, // UART mode
-    EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION // Oversampling
-};
+//const eUSCI_UART_Config UART_cfg_31250_12MHz = {
+//    EUSCI_A_UART_CLOCKSOURCE_SMCLK,
+//    24, // BRDIV
+//    0, // UCxBRF
+//    0, // UCxBRS
+//    EUSCI_A_UART_NO_PARITY,
+//    EUSCI_A_UART_LSB_FIRST,
+//    EUSCI_A_UART_ONE_STOP_BIT,
+//    EUSCI_A_UART_MODE, // UART mode
+//    EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION // Oversampling
+//};
+
+// Semaphore for threadBackChannelPrint.
+Semaphore backchannel_uart_mutex;
 
 } // end of anonymous namespace
 
 
-void UART::midi_uart_1_init() {
-    /* Select GPIO functionality */
-    // P2.2 is UART RX. We don't need TX because we are only receiving MIDI.
-    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P2, GPIO_PIN2, GPIO_PRIMARY_MODULE_FUNCTION);
-
-//    /* Configure digital oscillator */
-//    CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_12);
-
-    /* Configure UART with 31250 baud rate */
-    MAP_UART_initModule(EUSCI_A1_BASE, &UART_cfg_31250);
-
-    /* Enable UART */
-    MAP_UART_enableModule(EUSCI_A1_BASE);
-}
-
-
-void UART::midi_uart_2_init() {
-    /* Select GPIO functionality */
-    // P3.2 is UART RX. We don't need TX because we are only receiving MIDI.
-    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P3, GPIO_PIN2, GPIO_PRIMARY_MODULE_FUNCTION);
-
-//    /* Configure digital oscillator */
-//    CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_12);
-
-    /* Configure UART with 31250 baud rate */
-    MAP_UART_initModule(EUSCI_A2_BASE, &UART_cfg_31250);
-
-    /* Enable UART */
-    MAP_UART_enableModule(EUSCI_A2_BASE);
-}
-
-
-/* Initializes back channel UART at 31250 baud (to test settings). */
-//void back_channel_31250_init(void)
-//{
-//    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, GPIO_PIN2 | GPIO_PIN3, GPIO_PRIMARY_MODULE_FUNCTION); // TODO shouldn't TX be Output func? It still works...
-//    MAP_UART_initModule(EUSCI_A0_BASE, &UART_cfg_31250);
-//    MAP_UART_enableModule(EUSCI_A0_BASE);
-//}
-
-void UART::back_channel_pcb_init() {
+void uart::back_channel_init() {
+#if TARGET_PCB
     MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, GPIO_PIN2 | GPIO_PIN3, GPIO_PRIMARY_MODULE_FUNCTION); // TODO shouldn't TX be Output func? It still works...
     MAP_UART_initModule(EUSCI_A0_BASE, &UART_cfg_115200_3MHz);
     MAP_UART_enableModule(EUSCI_A0_BASE);
+
+#else
+    ClockSys_SetMaxFreq();
+    BackChannelInit(); // High-frequency setup
+#endif
+
+    // Initialize backchannel uart mutex
+    albertOS::initSemaphore(backchannel_uart_mutex, 1);
+}
+
+
+/**
+ * Uses a mutex to print to the backchannel UART in a thread-safe way.
+ */
+void uart::threadBackChannelPrint(const char* str, BackChannelTextStyle_t style) {
+    albertOS::waitSemaphore(backchannel_uart_mutex);
+    BackChannelPrint(str, style);
+    albertOS::signalSemaphore(backchannel_uart_mutex);
 }
