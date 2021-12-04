@@ -30,11 +30,11 @@ architecture default of staff is
     constant LINE_SPACING : natural := STAFF_HEIGHT / 6;
     
     -- Line heights
-    constant CENTER_LINE_HEIGHT : natural := CENTER_Y - LINE_THICKNESS / 2;
-    constant TOP_LINE_HEIGHT : natural := CENTER_LINE_HEIGHT - 2 * LINE_SPACING;
-    constant D_LINE_HEIGHT : natural := CENTER_LINE_HEIGHT - LINE_SPACING;
-    constant G_LINE_HEIGHT : natural := CENTER_LINE_HEIGHT + LINE_SPACING;
-    constant BOTTOM_LINE_HEIGHT : natural := CENTER_LINE_HEIGHT + 2 * LINE_SPACING;
+    constant B_LINE_HEIGHT : natural := CENTER_Y - LINE_THICKNESS / 2;
+    constant F_LINE_HEIGHT : natural := B_LINE_HEIGHT - 2 * LINE_SPACING;
+    constant D_LINE_HEIGHT : natural := B_LINE_HEIGHT - LINE_SPACING;
+    constant G_LINE_HEIGHT : natural := B_LINE_HEIGHT + LINE_SPACING;
+    constant E_LINE_HEIGHT : natural := B_LINE_HEIGHT + 2 * LINE_SPACING;
 
 begin
 
@@ -73,7 +73,7 @@ begin
         h => LINE_THICKNESS,
 
         x0 => LEDGER_X0, -- centerscreen minus offset: center of shape
-        y0 => TOP_LINE_HEIGHT,
+        y0 => F_LINE_HEIGHT,
 
         r => 15,
         g => 15,
@@ -123,7 +123,7 @@ begin
         h => LINE_THICKNESS,
 
         x0 => LEDGER_X0,
-        y0 => CENTER_LINE_HEIGHT,
+        y0 => B_LINE_HEIGHT,
 
         r => 15,
         g => 15,
@@ -173,7 +173,7 @@ begin
         h => LINE_THICKNESS,
 
         x0 => LEDGER_X0, -- centerscreen minus offset: center of shape
-        y0 => BOTTOM_LINE_HEIGHT,
+        y0 => E_LINE_HEIGHT,
 
         r => 15,
         g => 15,
