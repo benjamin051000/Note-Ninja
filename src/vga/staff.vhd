@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.vgalib_640x480_60.all;
+use work.staff_constants.all;
 
 entity staff is
 port(
@@ -16,26 +17,6 @@ end staff;
 
 architecture default of staff is
     signal vert_bar_color, g_ledger_color, d_ledger_color, b_ledger_color, f_ledger_color, e_ledger_color : std_logic_vector(color'range);
-
-    constant CENTER_X : natural := WIDTH / 2;
-    constant CENTER_Y : natural := HEIGHT / 2;
-
-    constant LEDGER_WIDTH : natural := WIDTH / 4;
-    constant LINE_THICKNESS : natural := 4;
-
-    constant LEDGER_X0 : natural := CENTER_X - LEDGER_WIDTH / 2;
-    
-    constant STAFF_HEIGHT : natural := HEIGHT/2;
-    
-    constant LINE_SPACING : natural := STAFF_HEIGHT / 6;
-    
-    -- Line heights
-    constant B_LINE_HEIGHT : natural := CENTER_Y - LINE_THICKNESS / 2;
-    constant F_LINE_HEIGHT : natural := B_LINE_HEIGHT - 2 * LINE_SPACING;
-    constant D_LINE_HEIGHT : natural := B_LINE_HEIGHT - LINE_SPACING;
-    constant G_LINE_HEIGHT : natural := B_LINE_HEIGHT + LINE_SPACING;
-    constant E_LINE_HEIGHT : natural := B_LINE_HEIGHT + 2 * LINE_SPACING;
-
 begin
 
     U_VERT_BAR: entity work.rect
