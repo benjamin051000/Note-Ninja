@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity note is
+entity rect is
 generic (
     -- REQUIRED
     -- Width and height of block.
@@ -10,6 +10,10 @@ generic (
     h : natural range 0 to 480;
 
     -- OPTIONAL
+    -- Initial position
+    x0 : natural range 0 to 640 := 640/2;
+    y0 : natural range 0 to 480 := 480/2;
+
     -- Color of block. (12-bit color: 4 bits per color)
     r : natural range 0 to 15 := 0;
     g : natural range 0 to 15 := 15;
@@ -29,11 +33,12 @@ port(
     -- To be combined into overall video out signal.
     color: out std_logic_vector(11 downto 0) -- 12 bits for R,G,B out
 );
-end note;
+end rect;
 
--- attempt to render one "note" block.
-architecture default of note is
+-- attempt to render one rectangle.
+architecture default of rect is
 
+    -- x and y represent the top left corner of the rect.
     signal x, y : natural range 0 to 640;
 
     constant FILLED_IN : std_logic_vector(11 downto 0) := std_logic_vector(to_unsigned(r, 4)) & std_logic_vector(to_unsigned(g, 4)) & std_logic_vector(to_unsigned(b, 4));
@@ -47,9 +52,9 @@ begin
 process(clk, rst) is
 begin
     if(rst = '1') then
-        -- Center block TODO don't do this
-        x <= 640 / 2;
-        y <= 480 / 2;
+        -- Reset to initial position.
+        x <= x0;
+        y <= y0;
     elsif(rising_edge(clk)) then
         if(update = '1') then
             x <= new_x;

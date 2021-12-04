@@ -33,26 +33,41 @@ architecture bhv of rgb_gen is
 	-- signal en : std_logic;
 	-- signal u_vcnt, u_hcnt, row_offset, col_offset, row, col : unsigned(9 downto 0);
 	
-	signal new_x, new_y : integer range 0 to 640;
-
-    signal color: std_logic_vector(11 downto 0); -- 12 bits for R,G,B out
+	signal new_x, new_y : integer range 0 to 480;
 
 	signal count : natural range 0 to 50000;
 
 	signal update_note : std_logic;
+
+
+	----------------------------------------------
+	signal combined_color : std_logic_vector(11 downto 0);
+	
+	signal staff_color : std_logic_vector(combined_color'range);
+	signal note_color: std_logic_vector(combined_color'range); -- 12 bits for R,G,B out
 
 begin
 
 	-- r <= "1111" when (video_on = '1' and vcount - hcount >= 75) else "0000";
 	-- g <= "1111" when (video_on = '1' and vcount - hcount < 100) else "0000";
 	-- b <= "1111" when video_on = '1' and vcount < hcount else "0000";
-	r <= color(11 downto 8);
-	g <= color(7 downto 4);
-	b <= color(3 downto 0);
+	r <= combined_color(11 downto 8);
+	g <= combined_color(7 downto 4);
+	b <= combined_color(3 downto 0);
+
+	combined_color <= staff_color or note_color;
 	
+	U_STAFF: entity work.staff
+	port map(
+		clk => clk,
+		rst => rst,
+		hcount => hcount,
+		vcount => vcount,
+		color => staff_color
+	);
 
 	-- for testing
-	U_NOTE: entity work.note
+	U_NOTE: entity work.rect
 	generic map(
 		w => 50,
 		h => 25
@@ -68,7 +83,7 @@ begin
 		new_x => new_x,
 		new_y => new_y,
 
-		color => color
+		color => note_color
 	);
 
 	-- a simple counter to move the note around.
