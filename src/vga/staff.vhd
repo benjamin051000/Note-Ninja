@@ -43,9 +43,7 @@ begin
         
         color => vert_bar_color
     );
-
-    -- U_LEDGER_LINES : for line_height in BOTTOM_LINE to TOP_LINE generate
-
+    
 
     -- Draw ledger lines
     U_F_LEDGER: entity work.rect

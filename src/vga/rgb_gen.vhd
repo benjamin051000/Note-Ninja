@@ -33,9 +33,9 @@ architecture bhv of rgb_gen is
 	-- signal en : std_logic;
 	-- signal u_vcnt, u_hcnt, row_offset, col_offset, row, col : unsigned(9 downto 0);
 	
-	signal new_x, new_y : integer range 0 to 480;
+	-- signal new_x, new_y : integer range 0 to 480;
 
-	signal count : natural range 0 to 50000;
+	signal count : natural range 0 to 100000;
 
 	signal update_note : std_logic;
 
@@ -44,22 +44,46 @@ architecture bhv of rgb_gen is
 	signal combined_color : std_logic_vector(11 downto 0);
 	
 	signal staff_color : std_logic_vector(combined_color'range);
-	signal note_color: std_logic_vector(combined_color'range); -- 12 bits for R,G,B out
+	-- signal note_color: std_logic_vector(combined_color'range); -- 12 bits for R,G,B out
 
-	type note_height_arr is array(0 to 11) of natural;
-	-- constant note_heights : note_height_arr := ();
+	type natural_arr_t is array(0 to 4) of natural;
+	
+	constant new_y_vals : natural_arr_t := (NOTE_LOW_E_HEIGHT, NOTE_LOW_G_HEIGHT, NOTE_B_HEIGHT, NOTE_HIGH_D_HEIGHT, NOTE_HIGH_F_HEIGHT);
+
+	-- note: range for these is 0-15
+	constant color_arr_r : natural_arr_t := (15, 0, 0, 10, 15);
+	constant color_arr_g : natural_arr_t := (0, 15, 0, 10, 15);
+	constant color_arr_b : natural_arr_t := (0, 0, 15, 10, 15);
+
+
+	signal new_x_vals : natural_arr_t;
+
+	type note_colors_t is array(0 to 4) of std_logic_vector(combined_color'range);
+
+	signal note_colors : note_colors_t;
+
+
+	-- function any_or (a : note_colors_t) return std_logic_vector(11 downto 0) is
+	-- 	variable temp : std_logic_vector(11 downto 0) := (others => '0');
+	-- begin
+	-- 	for i in 0 to 4 loop
+	-- 		temp := temp or a(i);
+	-- 	end loop;
+	
+	-- 	return temp;
+	-- end function;
+
+	-- signal any_note_colors : std_logic_vector(combined_color'range);
 
 begin
+	combined_color <= staff_color or note_colors(0) or note_colors(1) or note_colors(2) or note_colors(3) or note_colors(4);
 
-	-- r <= "1111" when (video_on = '1' and vcount - hcount >= 75) else "0000";
-	-- g <= "1111" when (video_on = '1' and vcount - hcount < 100) else "0000";
-	-- b <= "1111" when video_on = '1' and vcount < hcount else "0000";
 	r <= combined_color(11 downto 8);
 	g <= combined_color(7 downto 4);
 	b <= combined_color(3 downto 0);
 
-	combined_color <= staff_color or note_color;
-	
+
+	------------------------------------------------------------------
 	U_STAFF: entity work.staff
 	port map(
 		clk => clk,
@@ -69,46 +93,62 @@ begin
 		color => staff_color
 	);
 
-	-- for testing
-	U_NOTE: entity work.rect
-	generic map(
-		w => 50,
-		h => 25
-	)
-	port map(
-		vcount => vcount,
-		hcount => hcount,
-		
-		clk => clk,
-		rst => rst,
-		
-		update => update_note,
-		new_x => new_x,
-		new_y => new_y,
+	U_NOTES: for i in 0 to 4 generate
+		-- for testing
+		U_NOTE: entity work.rect
+		generic map(
+			w => 50,
+			h => NOTE_HEIGHT,
+			r => color_arr_r(i),
+			g => color_arr_g(i),
+			b => color_arr_b(i)
+		)
+		port map(
+			clk,
+			rst,
+			hcount,
+			vcount,
+			
+			update => update_note,
+			new_x => new_x_vals(i),
+			new_y => new_y_vals(i),
 
-		color => note_color
-	);
+			color => note_colors(i)
+		);
+	end generate U_NOTES;
 
 	-- a simple counter to move the note around.
 	process(clk, rst)
 	begin
 		if(rst = '1')then
 			count <= 0;
-			new_x <= 0;
-			new_y <= 0;
+
+			for i in 0 to 4 loop
+				new_x_vals(i) <= 600; -- Start them off screen right
+			end loop;
+
 		elsif(rising_edge(clk)) then
 			count <= count + 1;
 
 			update_note <= '0';
+			
+			-- Default value for new x values
+			for i in 0 to 4 loop
+				new_x_vals(i) <= new_x_vals(i);
+			end loop;
 
-			if(count = 50000) then
-				new_x <= new_x + 1;
-				new_y <= new_y + 1;
+			if(count = 100000) then -- 100k
+
+				-- Move each note to the left.
+				for i in 0 to 4 loop
+					new_x_vals(i) <= new_x_vals(i) - 1; -- latch inference OK
+				end loop;
+
 				update_note <= '1';
+				count <= 0;
 			end if;
+
 		end if;
 	end process;
-
-
 
 end bhv;
