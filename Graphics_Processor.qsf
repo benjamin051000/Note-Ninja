@@ -208,6 +208,7 @@ set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -
 set_global_assignment -name EXTERNAL_FLASH_FALLBACK_ADDRESS 00000000
 set_global_assignment -name INTERNAL_FLASH_UPDATE_MODE "SINGLE IMAGE WITH ERAM"
 set_location_assignment PIN_B8 -to rst_l
+set_global_assignment -name VHDL_FILE src/vga/staff_lib.vhd
 set_global_assignment -name VHDL_FILE src/vga/staff.vhd
 set_global_assignment -name VHDL_FILE src/vga/rect.vhd
 set_global_assignment -name VHDL_FILE src/clk_div.vhd
