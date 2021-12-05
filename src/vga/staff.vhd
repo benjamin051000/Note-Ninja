@@ -36,11 +36,21 @@ begin
         rst,
         hcount,
         vcount,
-        update => '0',
-
-        new_x => 0, -- unused
-        new_y => 0, -- unused
         
+        -- Never move x or y.
+        update_x => '0',
+        reset_x => '0',
+
+        set_y => '0',
+        new_y => 0,
+
+        -- This should always be visible.
+        new_visible => '1',
+        set_visible => '1',
+
+        curr_x => open,
+        curr_y => open,
+
         color => vert_bar_color
     );
     
