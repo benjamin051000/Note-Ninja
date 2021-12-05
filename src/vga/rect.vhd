@@ -29,6 +29,8 @@ port(
     update: in std_logic;
     new_x, new_y : in natural range 0 to 640;
     
+    -- Bool to enable/disable color output. If disabled, rect never displays color.
+    visible : in std_logic := '1';
     
     -- x and y represent the top left corner of the rect.
     x : out natural range 0 to 640;
@@ -75,8 +77,8 @@ end process;
 -- hcount/vcount is within the block body.
 color <= FILLED_IN when (
         -- Relational ops are evaluated before logical ops! No extra ()s needed.
-        (hcount >= x_signal and hcount < x_signal + w) and (vcount >= y_signal and vcount < y_signal + h)
-    ) 
+        visible = '1' and (hcount >= x_signal and hcount < x_signal + w) and (vcount >= y_signal and vcount < y_signal + h)
+    )
     else BLACK;
 
 end default;
