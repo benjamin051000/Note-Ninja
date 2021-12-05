@@ -18,15 +18,24 @@ package staff_constants is
     
     constant LINE_SPACING : natural := STAFF_HEIGHT / 6;
     
-
+    ---------------------------------------------------------------------------
     -- Point at which the center of each line is.
+    -- Intermediate values, see NOTE_XXX_HEIGHT below to align the notes.
     constant B_LINE_CENTER : natural := CENTER_Y;
     constant F_LINE_CENTER : natural := B_LINE_CENTER - 2 * LINE_SPACING;
     constant D_LINE_CENTER : natural := B_LINE_CENTER - LINE_SPACING;
     constant G_LINE_CENTER : natural := B_LINE_CENTER + LINE_SPACING;
     constant E_LINE_CENTER : natural := B_LINE_CENTER + 2 * LINE_SPACING;
 
+    -- spaces (no visible lines here)
+    constant LOW_D_LINE_CENTER : natural := B_LINE_CENTER + 5 * LINE_SPACING / 2; -- 5/2 = 2.5 line spaces
+    constant LOW_F_LINE_CENTER : natural := B_LINE_CENTER + 3 * LINE_SPACING / 2; -- 3/2 = 1.5
+    constant A_LINE_CENTER : natural := B_LINE_CENTER + LINE_SPACING / 2; -- 1/2 line spaces
+    constant C_LINE_CENTER : natural := B_LINE_CENTER - LINE_SPACING / 2;
+    constant HIGH_E_LINE_CENTER : natural := B_LINE_CENTER - 3 * LINE_SPACING / 2;
+    constant HIGH_G_LINE_CENTER : natural := B_LINE_CENTER - 5 * LINE_SPACING / 2;
 
+    ---------------------------------------------------------------------------
     -- Line heights (accounts for line thickness)
     constant F_LINE_HEIGHT : natural := F_LINE_CENTER - LINE_THICKNESS / 2;
     constant D_LINE_HEIGHT : natural := D_LINE_CENTER - LINE_THICKNESS / 2;
@@ -34,7 +43,11 @@ package staff_constants is
     constant G_LINE_HEIGHT : natural := G_LINE_CENTER - LINE_THICKNESS / 2;
     constant E_LINE_HEIGHT : natural := E_LINE_CENTER - LINE_THICKNESS / 2;
 
+    -- spaces
+    -- not needed for spaces, since we won't display a line on these anyway.
+    -- constant LOW_F_LINE_HEIGHT : natural := LOW_F_LINE_CENTER - LINE_THICKNESS / 2;
 
+    ---------------------------------------------------------------------------
     -- note heights, which are calculated from the ledger line centers.
     constant NOTE_HEIGHT : natural := 30; -- notes should be 30 pixels tall
     
@@ -43,7 +56,14 @@ package staff_constants is
     constant NOTE_B_HEIGHT      : natural := B_LINE_CENTER - NOTE_HEIGHT / 2;
     constant NOTE_LOW_G_HEIGHT  : natural := G_LINE_CENTER - NOTE_HEIGHT / 2;
     constant NOTE_LOW_E_HEIGHT  : natural := E_LINE_CENTER - NOTE_HEIGHT / 2;
-
+    
+    -- spaces
+    constant NOTE_LOW_D_HEIGHT : natural := LOW_D_LINE_CENTER - NOTE_HEIGHT / 2;
+    constant NOTE_LOW_F_HEIGHT : natural := LOW_F_LINE_CENTER - NOTE_HEIGHT / 2;
+    constant NOTE_A_HEIGHT : natural := A_LINE_CENTER - NOTE_HEIGHT / 2;
+    constant NOTE_C_HEIGHT : natural := C_LINE_CENTER - NOTE_HEIGHT / 2;
+    constant NOTE_HIGH_E_HEIGHT : natural := HIGH_E_LINE_CENTER - NOTE_HEIGHT / 2;
+    constant NOTE_HIGH_G_HEIGHT : natural := HIGH_G_LINE_CENTER - NOTE_HEIGHT / 2;
 
 end staff_constants;
 
