@@ -19,7 +19,9 @@ entity vga_top is
 		
 		-- Output signals to the display.
 		vga_hsync, vga_vsync : out std_logic;
-		r, g, b : out std_logic_vector(3 downto 0)
+		r, g, b : out std_logic_vector(3 downto 0);
+
+		uart_rx : in std_logic
 	);
 end vga_top;
 
@@ -72,7 +74,8 @@ begin -- STR
 			video_on => video_on,
 			r => r,
 			g => g,
-			b => b
+			b => b,
+			uart_rx => uart_rx
 		);
 
 end STR;

@@ -20,7 +20,8 @@ port (
 	-- data : in std_logic_vector(11 downto 0);
 	-- back_buf_wren : in std_logic;
 	
-	r, g, b : out std_logic_vector(3 downto 0)
+	r, g, b : out std_logic_vector(3 downto 0);
+	uart_rx : in std_logic -- uart rx input line
 );
 end rgb_gen;
 
@@ -62,6 +63,10 @@ architecture bhv of rgb_gen is
 
 	signal note_colors : note_colors_t;
 
+	----------------------------------------------------------
+	signal received, is_receiving : std_logic;
+	signal rx_byte, rx_byte_reg : std_logic_vector(7 downto 0);
+	signal reset_uart_buf : std_logic;
 
 	-- function any_or (a : note_colors_t) return std_logic_vector(11 downto 0) is
 	-- 	variable temp : std_logic_vector(11 downto 0) := (others => '0');
@@ -70,11 +75,29 @@ architecture bhv of rgb_gen is
 	-- 		temp := temp or a(i);
 	-- 	end loop;
 	
-	-- 	return temp;
-	-- end function;
+	component uart
+	generic(
+		baud_rate : natural := 9600;
+		sys_clk_freq : natural := 100000000 -- 100MHz
+	);
+	port (
+		clk, rst: in std_logic;
 
-	-- signal any_note_colors : std_logic_vector(combined_color'range);
+		rx : in std_logic; -- incoming serial line
+		tx : out std_logic; -- outgoing serial line
 
+		transmit: in std_logic; -- transmit begins transmission
+		tx_byte : in std_logic_vector(7 downto 0); -- signal to transmit
+
+		received : out std_logic; -- rx flag
+		rx_byte : out std_logic_vector(7 downto 0); -- received byte
+
+		is_receiving, is_transmitting, recv_error : out std_logic; -- status flags
+		
+		-- Not sure what these do.
+		rx_samples, rx_sample_countdown : out std_logic_vector(3 downto 0)
+	);
+	end component;
 begin
 	combined_color <= staff_color or note_colors(0) or note_colors(1) or note_colors(2) or note_colors(3) or note_colors(4);
 
@@ -151,4 +174,25 @@ begin
 		end if;
 	end process;
 
+	------------------------------------------------------
+	U_UART_IN: uart
+	generic map(
+		baud_rate => 115200,
+		sys_clk_freq => 25000000 -- 25MHz
+	)
+	port map(
+		clk,
+		rst,
+		uart_rx,
+		tx => open,
+		transmit => '0',
+		tx_byte => (others => '0'),
+		received => received, -- will be asserted for one clock cycle.
+		rx_byte => rx_byte,
+		is_receiving => is_receiving,
+		is_transmitting => open,
+		recv_error => open,
+		rx_samples => open,
+		rx_sample_countdown => open
+	);
 end bhv;
