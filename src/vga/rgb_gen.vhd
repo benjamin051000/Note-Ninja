@@ -98,8 +98,21 @@ architecture bhv of rgb_gen is
 		rx_samples, rx_sample_countdown : out std_logic_vector(3 downto 0)
 	);
 	end component;
+
+	-- Reduce array of vectors into a single vector, using the OR operator.
+	function or_reduce(a : note_colors_t) return std_logic_vector is
+		variable ret : std_logic_vector(11 downto 0) := (others => '0');
 begin
-	combined_color <= staff_color or note_colors(0) or note_colors(1) or note_colors(2) or note_colors(3) or note_colors(4);
+		for i in a'range loop
+			ret := ret or a(i);
+		end loop;
+	
+		return ret;
+	end function or_reduce;
+
+begin
+	combined_color <= staff_color or or_reduce(note_colors);
+
 
 	r <= combined_color(11 downto 8);
 	g <= combined_color(7 downto 4);
