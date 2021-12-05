@@ -7,14 +7,18 @@ use work.vgalib_640x480_60.all;
 entity vga_sync_gen is
 port (
     clk, rst : in std_logic;
-    Hcount, Vcount : out std_logic_vector(9 downto 0);
+    -- Hcount, Vcount : out std_logic_vector(9 downto 0);
+    hcount : out natural range 0 to 640;
+    vcount : out natural range 0 to 480;
     hsync, vsync, video_on : out std_logic
 );
 end vga_sync_gen;
 
 
 architecture bhv of vga_sync_gen is
-    signal h, v : natural;
+    -- signal h, v : natural;
+    signal v : natural range 0 to 480;
+    signal h : natural range 0 to 640;
 begin
     -- Counters
     process(clk, rst)
@@ -64,7 +68,9 @@ begin
     end process;
 	 
 	 
-	 Hcount <= std_logic_vector(to_unsigned(h, 10));
-    Vcount <= std_logic_vector(to_unsigned(v, 10));
+	--  Hcount <= std_logic_vector(to_unsigned(h, 10));
+    -- Vcount <= std_logic_vector(to_unsigned(v, 10));
+    hcount <= h;
+    vcount <= v;
 
 end bhv;

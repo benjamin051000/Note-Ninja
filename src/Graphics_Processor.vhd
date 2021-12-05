@@ -3,35 +3,43 @@ use ieee.std_logic_1164.all;
 
 entity Graphics_Processor is
 	port (
-		clk50MHz, rst : in std_logic;
+		clk50MHz, rst_l : in std_logic;
 
 		vsync, hsync : out std_logic;
-		r, g, b : out std_logic_vector(3 downto 0)
+		r, g, b : out std_logic_vector(3 downto 0);
+
+		uart_rx : in std_logic -- incoming UART line
 	);
 end Graphics_Processor;
 
 architecture default of Graphics_Processor is
 
-signal clk25MHz : std_logic;
+signal clk : std_logic;
+
+-- signal clk100MHz, clk108MHz, clk150MHz, clk200MHz : std_logic;
+
+signal rst : std_logic;
+
 
 begin
 
+	rst <= not rst_l;
+
 	U_CLK_DIV : entity work.clk_div
 	generic map(
-				clk_in_freq => 50,
-            clk_out_freq => 25--25000000
-	)
-				
+		clk_in_freq => 50,
+        clk_out_freq => 25 -- 25 MHz out
+	)		
    port map (
         clk_in  => clk50MHz,
-        clk_out => clk25MHz,
-		  rst => not rst
+        clk_out => clk,
+		rst => rst
 	);
 
 	U_VGA : entity work.vga_top
 		port map(
-			clk => clk25MHz,
-			rst => not rst,
+			clk => clk,
+			rst => rst,
 
 			vga_hsync => hsync,
 			vga_vsync => vsync,
@@ -39,11 +47,8 @@ begin
 			g => g,
 			b => b,
 
-			-- Unused (will likely be removed for this project)
-			cpu_says_swap_buf => '0',
-			wraddr => (others => '0'),
-			data => (others => '0'),
-			back_buf_wren => '0'
+			uart_rx => uart_rx
+
 		);
 
 end default;
