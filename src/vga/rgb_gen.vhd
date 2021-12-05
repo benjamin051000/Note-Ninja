@@ -22,7 +22,9 @@ port (
 	
 	r, g, b : out std_logic_vector(3 downto 0);
 
-	uart_rx : in std_logic -- uart rx input line
+	uart_rx : in std_logic; -- uart rx input line
+	uart_tx : out std_logic -- uart outgoing serial line
+
 );
 end rgb_gen;
 
@@ -98,6 +100,8 @@ begin -- bhv
 		vcount,
 
 		uart_rx,
+		uart_tx,
+
 		note_colors
 	);
 

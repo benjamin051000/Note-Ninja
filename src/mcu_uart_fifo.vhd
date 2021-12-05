@@ -7,6 +7,7 @@ port(
     clk, rst : in std_logic;
 
     uart_rx : in std_logic; -- uart incoming serial line
+	uart_tx : out std_logic; -- uart outgoing serial line
 
     read_next_uart_word : in std_logic; -- request next FIFO word
     size : out std_logic_vector(4 downto 0); -- current size of FIFO
@@ -57,9 +58,12 @@ begin
 		clk,
 		rst,
 		uart_rx,
-		tx => open,
-		transmit => '0',
-		tx_byte => (others => '0'),
+		tx => uart_tx,
+
+		-- Echo back what was sent.
+		transmit => received,
+		tx_byte => rx_byte,
+
 		received => received, -- will be asserted for one clock cycle.
 		rx_byte => rx_byte,
 		is_receiving => open,

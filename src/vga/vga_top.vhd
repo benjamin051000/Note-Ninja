@@ -21,7 +21,9 @@ entity vga_top is
 		vga_hsync, vga_vsync : out std_logic;
 		r, g, b : out std_logic_vector(3 downto 0);
 
-		uart_rx : in std_logic
+		uart_rx : in std_logic;
+		uart_tx : out std_logic -- uart outgoing serial line
+
 	);
 end vga_top;
 
@@ -75,7 +77,8 @@ begin -- STR
 			r => r,
 			g => g,
 			b => b,
-			uart_rx => uart_rx
+			uart_rx => uart_rx,
+			uart_tx => uart_tx
 		);
 
 end STR;

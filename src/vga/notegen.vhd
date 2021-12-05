@@ -11,6 +11,7 @@ port (
     vcount : in natural range 0 to 480;
     
     uart_rx : in std_logic; -- uart incoming serial line
+	uart_tx : out std_logic; -- uart outgoing serial line
 
     note_colors : out std_logic_vector(11 downto 0)
 );
@@ -85,6 +86,8 @@ begin -- default ---------------------------------------------------------
         clk,
         rst,
         uart_rx,
+        uart_tx,
+
         read_next_uart_word => fifo_get_next_word,
         size => open,
         empty => fifo_empty,
@@ -175,7 +178,7 @@ begin -- default ---------------------------------------------------------
                     when x"41" => -- char "A"
                         update_x <= '1';
                     
-                    when x"1D" =>
+                    when x"44" => -- char "D"
                         new_y(0) <= NOTE_LOW_D_HEIGHT;
                         set_y(0) <= '1';
                         reset_x(0) <= '1';

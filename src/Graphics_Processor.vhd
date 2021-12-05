@@ -8,7 +8,9 @@ entity Graphics_Processor is
 		vsync, hsync : out std_logic;
 		r, g, b : out std_logic_vector(3 downto 0);
 
-		uart_rx : in std_logic -- incoming UART line
+		uart_rx : in std_logic; -- incoming UART line
+		uart_tx : out std_logic -- uart outgoing serial line
+		
 	);
 end Graphics_Processor;
 
@@ -47,7 +49,8 @@ begin
 			g => g,
 			b => b,
 
-			uart_rx => uart_rx
+			uart_rx => uart_rx,
+			uart_tx => uart_tx
 
 		);
 
