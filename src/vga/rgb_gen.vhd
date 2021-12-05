@@ -37,9 +37,9 @@ architecture bhv of rgb_gen is
 	
 	-- signal new_x, new_y : integer range 0 to 480;
 
-	signal count : natural range 0 to 100000;
+	-- signal count : natural range 0 to 100000;
 
-	signal update_note : std_logic;
+	-- signal update_note : std_logic;
 
 
 	----------------------------------------------
@@ -57,13 +57,13 @@ architecture bhv of rgb_gen is
 	
 
 
-	signal new_x_vals, curr_x_vals, new_y_vals : natural_arr_t(0 to NUMBER_OF_NOTES-1);
+	-- signal new_x_vals, curr_x_vals, new_y_vals : natural_arr_t(0 to NUMBER_OF_NOTES-1);
 
 	signal note_colors : std_logic_vector(combined_color'range);
 
 	-- type visible_arr is array(0 to NUMBER_OF_NOTES-1) of std_logic;
-	signal visibles : std_logic_vector(NUMBER_OF_NOTES-1 downto 0);
-	signal notes_pos_reset_arr : std_logic_vector(NUMBER_OF_NOTES-1 downto 0);
+	-- signal visibles : std_logic_vector(NUMBER_OF_NOTES-1 downto 0);
+	-- signal notes_pos_reset_arr : std_logic_vector(NUMBER_OF_NOTES-1 downto 0);
 
 	----------------------------------------------------------
 	signal reset_uart_buf : std_logic;
@@ -93,6 +93,10 @@ begin -- bhv
 	port map(
 		clk,
 		rst,
+		
+		hcount,
+		vcount,
+
 		uart_rx,
 		note_colors
 	);

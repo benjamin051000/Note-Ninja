@@ -9,7 +9,7 @@ port(
     uart_rx : in std_logic; -- uart incoming serial line
 
     read_next_uart_word : in std_logic; -- request next FIFO word
-    size : out std_logic_vector(3 downto 0); -- current size of FIFO
+    size : out std_logic_vector(4 downto 0); -- current size of FIFO
     empty : out std_logic; -- bool if FIFO is empty
     next_word : out std_logic_vector(7 downto 0) -- FIFO output
 

@@ -131,8 +131,6 @@ begin -- default ---------------------------------------------------------
         if(rst = '1') then
             state <= IDLE_STATE;
 
-            -- fifo_get_next_word <= '0';
-            -- uart_command <= (others => '0');
         elsif(rising_edge(clk)) then
             state <= next_state;
 
@@ -149,6 +147,7 @@ begin -- default ---------------------------------------------------------
         -- FSM defaults
         next_state <= state; -- Stay in current state.
         save_uart_word <= '0';
+        fifo_get_next_word <= '0';
 
         -- Decoder output defaults
         update_x <= '0';

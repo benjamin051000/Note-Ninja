@@ -77,7 +77,7 @@ begin
             -- Reset to initial position.
             x <= x0;
             y  <= y0;
-            visible_s <= '0'; -- Start invisible.
+            visible <= '0'; -- Start invisible.
 
         elsif(rising_edge(clk)) then
             
