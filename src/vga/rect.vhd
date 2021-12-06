@@ -1,12 +1,14 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.vgalib_640x480_60.WIDTH;
+use work.vgalib_640x480_60.HEIGHT;
 
 entity rect is
 generic (
     -- Width and height of block.
-    w : natural range 0 to 640;
-    h : natural range 0 to 480;
+    w : natural range 0 to WIDTH;
+    h : natural range 0 to HEIGHT;
 
     -- Color of block. (12-bit color: 4 bits per color)
     r, g, b : natural range 0 to 15;
@@ -16,15 +18,15 @@ generic (
     x_speed : integer := -1;
     
     -- Default locations (useful for static non-moving rects)
-    x0 : natural range 0 to 640 := 640/2;
-    y0 : natural range 0 to 480 := 480/2
+    x0 : natural range 0 to WIDTH := WIDTH/2;
+    y0 : natural range 0 to HEIGHT := HEIGHT/2
 );
 port(
     clk, rst : in std_logic;
 
     -- Used for color output
-    hcount : in natural range 0 to 640;
-    vcount : in natural range 0 to 480;
+    hcount : in natural range 0 to WIDTH;
+    vcount : in natural range 0 to HEIGHT;
 
     -- Update x position by its speed.
     update_x: in std_logic;
@@ -32,15 +34,15 @@ port(
     
     -- Update y position to a new value.
     set_y: in std_logic;
-    new_y : in natural range 0 to 480;
+    new_y : in natural range 0 to HEIGHT;
     
     -- Enable/disable color output.
     -- show, hide : in std_logic;
     new_visible, set_visible : in std_logic;
     
     -- x and y are the top left corner of the rect.
-    curr_x : out natural range 0 to 640;
-    curr_y : out natural range 0 to 480;
+    curr_x : out natural range 0 to WIDTH;
+    curr_y : out natural range 0 to HEIGHT;
 
     -- What the monitor should display for these pixels.
     -- To be combined into overall video out signal.
@@ -59,8 +61,8 @@ architecture default of rect is
     -- Black for now
     constant BLACK : std_logic_vector := std_logic_vector(to_unsigned(0, 12));
 
-    signal x : natural range 0 to 640;
-    signal y : natural range 0 to 480;
+    signal x : natural range 0 to WIDTH;
+    signal y : natural range 0 to HEIGHT;
 
     signal visible : std_logic; -- Register to save "visible" port input.
 
@@ -83,7 +85,7 @@ begin
             
             -- Reset x to the right of the screen (new notes)
             if(reset_x = '1') then
-                x <= 640;
+                x <= WIDTH;
             end if;
 
             -- Update x by x_speed
@@ -94,6 +96,13 @@ begin
             -- Update y position
             if(set_y = '1') then
                 y <= new_y;
+            end if;
+
+            -- Default visibility: If the note is far left, make it invisible.
+            -- Note: Notes will ALWAYS be invisible after this x value, 
+            -- regardless of user-supplied visibility setting.
+            if(x < WIDTH/2 - 100) then
+                visible <= '0';
             end if;
 
             -- Update visibility
