@@ -1,18 +1,12 @@
-#include <stdint.h>
-#include <stdio.h>
-
-#include "main.h"
-
-#include "msp.h"
-#include "BSP.h"
-#include "demo_sysctl.h"
-#include <driverlib.h>
-
-#include "uart.h"
-
-#include "MIDI_MSP.h"
-
+// STL includes
+#include <stdio.h> // for sprintf, snprintf
+// Library includes
 #include <albertOS.h>
+// Source file includes
+#include "main.h"
+#include "uart.h"
+#include "midi.h"
+#include "threads.h"
 
 /**
  * Report clock information
@@ -33,184 +27,47 @@ void report_clk_info() {
     char msg[64];
 
     snprintf(msg, 64, "aclk = %d", aclk);
-    BackChannelPrint(msg, BackChannel_Info);
+    uart::threadBackChannelPrint(msg, BackChannel_Info);
 
     snprintf(msg, 64, "mclk = %d", mclk);
-    BackChannelPrint(msg, BackChannel_Info);
+    uart::threadBackChannelPrint(msg, BackChannel_Info);
 
     snprintf(msg, 64, "smclk = %d", smclk);
-    BackChannelPrint(msg, BackChannel_Info);
+    uart::threadBackChannelPrint(msg, BackChannel_Info);
 
     snprintf(msg, 64, "hsmclk = %d", hsmclk);
-    BackChannelPrint(msg, BackChannel_Info);
+    uart::threadBackChannelPrint(msg, BackChannel_Info);
 
     snprintf(msg, 64, "bclk = %d", bclk);
-    BackChannelPrint(msg, BackChannel_Info);
+    uart::threadBackChannelPrint(msg, BackChannel_Info);
 
     snprintf(msg, 64, "system frequency = %d", system_freq);
-    BackChannelPrint(msg, BackChannel_Info);
-}
-
-/////////////////////////////////////////////
-// MIDI callback functions
-/////////////////////////////////////////////
-
-MIDI_CREATE_PCB_INSTANCE();
-
-struct NoteStatus {
-    byte pitch;
-    uint32_t systemTime;
-};
-
-albertOS::FIFO<NoteStatus> note_on_fifo, note_off_fifo;
-
-Semaphore backchannel_uart_mutex;
-
-void NoteOnHandler(byte channel, byte pitch, byte velocity) {
-//    GPIO_setOutputHighOnPin(GPIO_PORT_P1, LED_ONBOARD);
-    note_on_fifo.write(NoteStatus {
-        pitch,
-        systemTime
-    });
-}
-
-void NoteOffHandler(byte channel, byte pitch, byte velocity) {
-//    GPIO_setOutputLowOnPin(GPIO_PORT_P1, LED_ONBOARD);
-
-    note_off_fifo.write(NoteStatus {
-        pitch,
-        systemTime
-    });
-}
-
-//void ActiveSensingHandler() {
-////    albertOS::waitSemaphore(backchannel_uart_mutex);
-////    BackChannelPrint("Active sensing", BackChannel_Info);
-////    albertOS::signalSemaphore(backchannel_uart_mutex);
-//}
-
-void PitchBendHandler(byte channel, int val) {
-    char msg[64];
-    snprintf(msg, 64, "pitch bend: channel %d, val %d",
-             (int)channel, val);
-
-//    albertOS::waitSemaphore(backchannel_uart_mutex);
-
-//    BackChannelPrint(msg, BackChannel_Info);
-
-//    albertOS::signalSemaphore(backchannel_uart_mutex);
-}
-
-void MIDIErrorHandler(int8_t err) {
-    char msg[64];
-    snprintf(msg, 64, "ERROR: %d", (int)err);
-
-    // This is a PThread! No waiting for semaphores here.
-//    albertOS::waitSemaphore(backchannel_uart_mutex);
-
-//    BackChannelPrint(msg, BackChannel_Error);
-
-//    albertOS::signalSemaphore(backchannel_uart_mutex);
-}
-
-void midi_init() {
-    // Set MIDI callback functions
-    MIDI.setHandleNoteOn(NoteOnHandler);
-    MIDI.setHandleNoteOff(NoteOffHandler);
-//  MIDI.setHandleActiveSensing(ActiveSensingHandler);
-//    MIDI.setHandlePitchBend(PitchBendHandler);
-//    MIDI.setHandleError(MIDIErrorHandler);
-
-
-    MIDI.begin(); // Defaults to CH 1
-    MIDI.turnThruOff();
-}
-
-/**
- * Read once. Good for event threads.
- */
-void midi_read_once() {
-    MIDI.read();
-}
-/////////////////////////////////////////////
-// albertOS Threads
-/////////////////////////////////////////////
-void midi_read() {
-while(true) {
-    MIDI.read();
-//    albertOS::sleep(1);
-}} // end of thread
-
-
-void debug_note_on() {
-while(true) {
-    // Read from the FIFOs and send it to UART.
-    const NoteStatus note_on_info = note_on_fifo.read();
-
-    char msg[32];
-    snprintf(msg, 32, "ON %d (%d ms)", note_on_info.pitch, note_on_info.systemTime);
-
-    albertOS::waitSemaphore(backchannel_uart_mutex);
-
-    BackChannelPrint(msg, BackChannel_Info);
-
-    albertOS::signalSemaphore(backchannel_uart_mutex);
-
-    albertOS::sleep(100);
-}} // end of thread
-
-
-void debug_note_off() {
-while(true) {
-    // Read from the FIFOs and send it to UART.
-    const NoteStatus note_off_info = note_off_fifo.read();
-
-    char msg[32];
-    snprintf(msg, 32, "OFF %d (%d ms)", note_off_info.pitch, note_off_info.systemTime);
-
-    albertOS::waitSemaphore(backchannel_uart_mutex);
-
-    BackChannelPrint(msg, BackChannel_Info);
-
-    albertOS::signalSemaphore(backchannel_uart_mutex);
-}} // end of thread
-
-
-void blink_led() {
-    // Set up onboard LED
-    GPIO_setAsOutputPin(GPIO_PORT_P1, LED_ONBOARD);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P1, LED_ONBOARD);
-
-    while(true) {
-        GPIO_toggleOutputOnPin(GPIO_PORT_P1, LED_ONBOARD);
-        albertOS::sleep(500);
-    }
+    uart::threadBackChannelPrint(msg, BackChannel_Info);
 }
 
 void main() {
-#ifdef TARGET_PCB
-    UART::back_channel_pcb_init();
+    albertOS::init();
+
+    // Initialize UART to FPGA.
+    uart::init_port1();
+    uart::init_guitar();
+
+    // Initialize MIDI library and input from instrument.
+    midi::init();
+
+	// Enable UART RX as an aperiodic event.
+#if MIDI_MOCK_NOTES
+	albertOS::addThread(send_mock_notes, 1, (char*)"send mock notes");
 #else
-    ClockSys_SetMaxFreq();
-    BackChannelInit(); // High-frequency setup
+	albertOS::addAPeriodicEvent(midi_rx_isr, 1, EUSCIA1_IRQn);
 #endif
-    // Send clock information over backchannel UART.
-    // Doubles as a UART test, and ensures clock is correct speed.
-    report_clk_info();
 
-    // Initialize MIDI library
-    midi_init();
+    albertOS::addThread(decode_midi, 1, (char*)"decode midi");
 
-	albertOS::init();
+	albertOS::addThread(advance_notes, 1, (char*)"advance notes");
+	albertOS::addThread(send_song, 1, (char*)"send song");
 
-	albertOS::initSemaphore(backchannel_uart_mutex, 1);
-	albertOS::addThread(debug_note_on, 1, (char*)"debug note on");
-	albertOS::addThread(debug_note_off, 1, (char*)"debug note off");
-
-	albertOS::addThread(midi_read, 1, (char*)"midi read");
-	albertOS::addThread(blink_led, 1, (char*)"blink led");
-//	albertOS::addPeriodicEvent(midi_read_once, 1); // WARNING: Doesn't work if uart read blocks!
-//	albertOS::addAPeriodicEvent(midi_read_once, 1, EUSCIA1_IRQn);
+	albertOS::addThread(check_for_note, 1, (char*)"check4note");
 
 	albertOS::launch();
 }
