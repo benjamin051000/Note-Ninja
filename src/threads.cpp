@@ -106,6 +106,36 @@ void send_mock_notes() {
 }
 #endif
 
+
+void test_uart_to_fpga() {
+    using uart::FPGACommand;
+
+    uart::init_port1();
+
+    while(true) {
+        // Send Cmaj scale
+
+        for(unsigned cmd = (unsigned)FPGACommand::CREATE_LOW_D; cmd <= (unsigned)FPGACommand::CREATE_HIGH_G; cmd++) {
+
+            uart::send_fpga_command((FPGACommand)cmd);
+
+            // Advance the new note a little bit before making the next one.
+            for(unsigned i = 0; i < 75; i++) {
+                uart::send_fpga_command(FPGACommand::ADVANCE_NOTES);
+                albertOS::sleep(15);
+            }
+        }
+
+        // All the notes are made. Just wait for them to expire and go again
+        for(unsigned i = 0; i < 100; i++) {
+            uart::send_fpga_command(FPGACommand::ADVANCE_NOTES);
+            albertOS::sleep(15);
+        }
+
+    } // end of while(true)
+
+} // end of thread
+
 ////////////////////////////////////////////////////////////////
 // Events
 ////////////////////////////////////////////////////////////////

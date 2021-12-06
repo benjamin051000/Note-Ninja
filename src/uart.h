@@ -19,13 +19,39 @@ void midi_uart_1_init();
 //void midi_uart_2_init();
 
 /**
- * Initialize backchannel UART (via port1 pin 2) with a 3MHz SMCLK, 115200 baud.
+ * Initialize backchannel UART (via port1 pin 2 & 3) with 115200 baud.
  */
-void back_channel_init();
+void init_port1();
 
 /**
  * Uses a mutex to print to the backchannel UART in a thread-safe way.
  */
 void threadBackChannelPrint(const char* str, BackChannelTextStyle_t style);
+
+void thread_port1_send_str(const char* str);
+
+/**
+ * UART commands to send to the FPGA.
+ */
+enum FPGACommand {
+    ADVANCE_NOTES = 0x41, // Starts at 0x41 ('A') and increments for each entry
+    CREATE_LOW_D,
+    CREATE_LOW_E,
+    CREATE_LOW_F,
+    CREATE_LOW_G,
+    CREATE_A,
+    CREATE_B,
+    CREATE_C,
+    CREATE_HIGH_D,
+    CREATE_HIGH_E,
+    CREATE_HIGH_F,
+    CREATE_HIGH_G
+};
+
+
+/**
+ * Send a single byte command to the FPGA.
+ */
+void send_fpga_command(FPGACommand cmd);
 
 } // end of namespace UART

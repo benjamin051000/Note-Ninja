@@ -38,7 +38,7 @@ Semaphore backchannel_uart_mutex;
 } // end of anonymous namespace
 
 
-void uart::back_channel_init() {
+void uart::init_port1() {
 #if TARGET_PCB
     MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, GPIO_PIN2 | GPIO_PIN3, GPIO_PRIMARY_MODULE_FUNCTION); // TODO shouldn't TX be Output func? It still works...
     MAP_UART_initModule(EUSCI_A0_BASE, &UART_cfg_115200_3MHz);
@@ -62,3 +62,25 @@ void uart::threadBackChannelPrint(const char* str, BackChannelTextStyle_t style)
     BackChannelPrint(str, style);
     albertOS::signalSemaphore(backchannel_uart_mutex);
 }
+
+/**
+ * Send a plain string with no logging level syntax.
+ */
+void uart::thread_port1_send_str(const char* str) {
+    albertOS::waitSemaphore(backchannel_uart_mutex);
+    // Loop over each char until null.
+    while(*str) {
+        MAP_UART_transmitData(EUSCI_A0_BASE, *str++);
+    }
+    albertOS::signalSemaphore(backchannel_uart_mutex);
+}
+
+void uart::send_fpga_command(FPGACommand cmd) {
+    albertOS::waitSemaphore(backchannel_uart_mutex);
+
+    MAP_UART_transmitData(EUSCI_A0_BASE, (uint8_t)cmd);
+
+    albertOS::signalSemaphore(backchannel_uart_mutex);
+}
+
+

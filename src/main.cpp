@@ -48,11 +48,10 @@ void report_clk_info() {
 void main() {
     albertOS::init();
 
-    uart::back_channel_init();
 
     // Send clock information over backchannel UART.
     // Doubles as a UART test, and ensures clock is correct speed.
-    report_clk_info();
+//    report_clk_info();
 
     // Initialize MIDI library
     midi::init();
@@ -64,10 +63,12 @@ void main() {
 	albertOS::addAPeriodicEvent(midi_rx_isr, 1, EUSCIA1_IRQn);
 #endif
 
-    albertOS::addThread(decode_midi, 1, (char*)"decode midi");
+//    albertOS::addThread(decode_midi, 1, (char*)"decode midi");
 
 //	albertOS::addThread(midi_read, 1, (char*)"midi read");
 	albertOS::addThread(blink_led, 1, (char*)"blink led");
+
+	albertOS::addThread(test_uart_to_fpga, 1, (char*)"uart to fpga");
 
 	albertOS::launch();
 }
