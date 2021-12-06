@@ -16,7 +16,8 @@ void init();
 
 const int NOTE_ON = 0x90;
 const int NOTE_OFF = 0x80;
-const int ACTIVE_SENSING = 0xfe;
+const int ACTIVE_SENSING = 0xFE;
+const int CHANNEL_PRESSURE = 0xD0;
 
 enum decodeState {
     CHANNEL,
