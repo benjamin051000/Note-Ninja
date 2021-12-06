@@ -67,8 +67,28 @@ package staff_constants is
 
 end staff_constants;
 
--- package note_height_constants is
 
+------------------------------------------------------------------------------
+library ieee;
+use ieee.std_logic_1164.all;
+
+package uart_commands is
+    subtype byte_t is std_logic_vector(7 downto 0);
+
+    constant ADVANCE_NOTES : byte_t := x"41";
     
+    constant CREATE_LOW_D : byte_t := x"42";
+    constant CREATE_LOW_E : byte_t := x"43";
+    constant CREATE_LOW_F : byte_t := x"44";
+    constant CREATE_LOW_G : byte_t := x"45";
 
--- end note_height_constants;
+    constant CREATE_A : byte_t := x"46";
+    constant CREATE_B : byte_t := x"47";
+    constant CREATE_C : byte_t := x"48";
+    
+    constant CREATE_HIGH_D : byte_t := x"49";
+    constant CREATE_HIGH_E : byte_t := x"4A";
+    constant CREATE_HIGH_F : byte_t := x"4B";
+    constant CREATE_HIGH_G : byte_t := x"4C";
+
+end uart_commands;

@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.staff_constants.all;
+use work.uart_commands.all;
 
 entity notegen is
 port (
@@ -145,12 +146,13 @@ begin -- default ---------------------------------------------------------
 
     -- State machine process
     U_UART_DECODE_FSM_COMB: process(state, fifo_empty, uart_word_reg)
+        variable new_note_pitch : natural;
     begin
-
         -- FSM defaults
         next_state <= state; -- Stay in current state.
         save_uart_word <= '0';
         fifo_get_next_word <= '0';
+        new_note_pitch := 0;
 
         -- Decoder output defaults
         update_x <= '0';
@@ -174,19 +176,28 @@ begin -- default ---------------------------------------------------------
                 next_state <= DECODE_STATE;
             
             when DECODE_STATE =>
+                -- case statement to decode uart
                 case uart_word_reg is
-                    when x"41" => -- char "A"
+                    when ADVANCE_NOTES => -- char "A"
                         update_x <= '1';
                     
-                    when x"44" => -- char "D"
-                        new_y(0) <= NOTE_LOW_D_HEIGHT;
-                        set_y(0) <= '1';
-                        reset_x(0) <= '1';
-                        new_visible <= '1'; -- visible val to be saved
-                        set_visible(0) <= '1'; -- save visible val
+                    when CREATE_LOW_D => -- char "D"
+                        new_note_pitch := NOTE_LOW_D_HEIGHT;
+
+                    when CREATE_LOW_E =>
+                        new_note_pitch := NOTE_LOW_E_HEIGHT;
 
                     when others => null;
                 end case;
+                
+                -- Logic to create the new note
+                if(new_note_pitch /= 0) then
+                    new_y(0) <= new_note_pitch; -- TODO pick a note that's invisible
+                    set_y(0) <= '1';
+                    reset_x(0) <= '1';
+                    new_visible <= '1'; -- visible val to be saved
+                    set_visible(0) <= '1'; -- save visible val
+                end if;
                 
                 next_state <= IDLE_STATE;
 
