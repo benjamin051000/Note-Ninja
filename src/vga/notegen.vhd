@@ -181,11 +181,27 @@ begin -- default ---------------------------------------------------------
                     when ADVANCE_NOTES => -- char "A"
                         update_x <= '1';
                     
-                    when CREATE_LOW_D => -- char "D"
-                        new_note_pitch := NOTE_LOW_D_HEIGHT;
+                    when CREATE_LOW_D => new_note_pitch := NOTE_LOW_D_HEIGHT;
 
-                    when CREATE_LOW_E =>
-                        new_note_pitch := NOTE_LOW_E_HEIGHT;
+                    when CREATE_LOW_E => new_note_pitch := NOTE_LOW_E_HEIGHT;
+
+                    when CREATE_LOW_F => new_note_pitch := NOTE_LOW_F_HEIGHT;
+
+                    when CREATE_LOW_G => new_note_pitch := NOTE_LOW_G_HEIGHT;
+
+                    when CREATE_A => new_note_pitch := NOTE_A_HEIGHT;
+
+                    when CREATE_B => new_note_pitch := NOTE_B_HEIGHT;
+
+                    when CREATE_C => new_note_pitch := NOTE_C_HEIGHT;
+
+                    when CREATE_HIGH_D => new_note_pitch := NOTE_HIGH_D_HEIGHT;
+
+                    when CREATE_HIGH_E => new_note_pitch := NOTE_HIGH_E_HEIGHT;
+
+                    when CREATE_HIGH_F => new_note_pitch := NOTE_HIGH_F_HEIGHT;
+
+                    when CREATE_HIGH_G => new_note_pitch := NOTE_HIGH_G_HEIGHT;
 
                     when others => null;
                 end case;
