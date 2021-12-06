@@ -66,7 +66,8 @@ architecture default of notegen is
 
     -- set visibility on note i
     signal new_visible : std_logic;
-    signal set_visible : std_logic_vector(NUM_NOTES-1 downto 0);
+    signal set_visible, is_visible : std_logic_vector(NUM_NOTES-1 downto 0);
+    
     
     -- color array (to be reduced)
 	signal note_color_arr : color_array_t;
@@ -121,6 +122,7 @@ begin -- default ---------------------------------------------------------
 
             new_visible => new_visible,
             set_visible => set_visible(i),
+            is_visible => is_visible(i),
 
             curr_x => open, -- TODO may be unnecessary
             curr_y => open,
@@ -145,14 +147,17 @@ begin -- default ---------------------------------------------------------
     end process;
 
     -- State machine process
-    U_UART_DECODE_FSM_COMB: process(state, fifo_empty, uart_word_reg)
+    U_UART_DECODE_FSM_COMB: process(state, fifo_empty, uart_word_reg, is_visible)
         variable new_note_pitch : natural;
+        variable new_note_idx : natural;
     begin
         -- FSM defaults
         next_state <= state; -- Stay in current state.
         save_uart_word <= '0';
         fifo_get_next_word <= '0';
+        
         new_note_pitch := 0;
+        new_note_idx := NUM_NOTES; -- default is out of range of arrays.
 
         -- Decoder output defaults
         update_x <= '0';
@@ -208,11 +213,24 @@ begin -- default ---------------------------------------------------------
                 
                 -- Logic to create the new note
                 if(new_note_pitch /= 0) then
-                    new_y(0) <= new_note_pitch; -- TODO pick a note that's invisible
-                    set_y(0) <= '1';
-                    reset_x(0) <= '1';
-                    new_visible <= '1'; -- visible val to be saved
-                    set_visible(0) <= '1'; -- save visible val
+
+                    -- First, find an invisible note.
+                    for i in 0 to NUM_NOTES-1 loop
+                        if(is_visible(i) = '0') then
+                            -- Let's replace this one.
+                            new_note_idx := i;
+                        end if;
+                    end loop;
+                    
+                    -- If the above for loop found a valid note index
+                    if(new_note_idx /= NUM_NOTES) then
+                        -- Reset this new note
+                        new_y(new_note_idx) <= new_note_pitch;
+                        set_y(new_note_idx) <= '1';
+                        reset_x(new_note_idx) <= '1';
+                        new_visible <= '1'; -- visible val to be saved
+                        set_visible(new_note_idx) <= '1'; -- save visible val
+                    end if;
                 end if;
                 
                 next_state <= IDLE_STATE;

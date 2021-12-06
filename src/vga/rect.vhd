@@ -39,6 +39,7 @@ port(
     -- Enable/disable color output.
     -- show, hide : in std_logic;
     new_visible, set_visible : in std_logic;
+    is_visible : out std_logic; -- by default, leave open (not used often)
     
     -- x and y are the top left corner of the rect.
     curr_x : out natural range 0 to WIDTH;
@@ -67,6 +68,8 @@ architecture default of rect is
     signal visible : std_logic; -- Register to save "visible" port input.
 
 begin
+
+    is_visible <= visible;
 
     -- Update current locations.
     curr_x <= x;
