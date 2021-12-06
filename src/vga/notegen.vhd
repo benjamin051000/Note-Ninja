@@ -21,7 +21,7 @@ end notegen;
 architecture default of notegen is
     
     --Constants------------------------------------------------------
-    constant NUM_NOTES : natural := 6; -- Number of notes to render.
+    constant NUM_NOTES : natural := 15; -- Number of notes to render.
     
 
     --Type declarations-----------------------------------------------------
@@ -52,9 +52,9 @@ architecture default of notegen is
 
     --Note signals------------------------------------------------------
     -- Color range is 0-15
-	constant colors_r : note_array_t := (15, 0, 0, 15, 15, 0);
-	constant colors_g : note_array_t := (0, 15, 0, 15, 0, 15);
-	constant colors_b : note_array_t := (0, 0, 15, 0, 15, 15);
+    constant colors_r : note_array_t := (15,  0, 15,  0, 15,  0, 15, 3, 6, 9, 3, 6, 9, 13, 15);
+	constant colors_g : note_array_t := ( 0, 15, 15,  0,  0, 15, 15, 9, 6, 3, 3, 11, 9, 2, 13);
+	constant colors_b : note_array_t := ( 0,  0,  0, 15, 15, 15, 15, 3, 9, 6, 3, 4, 9, 8, 9);
 
     -- update_x updates note location based on its speed
     signal update_x : std_logic; -- Always update them all at once!
