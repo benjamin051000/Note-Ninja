@@ -101,7 +101,7 @@ begin
             -- Default visibility: If the note is far left, make it invisible.
             -- Note: Notes will ALWAYS be invisible after this x value, 
             -- regardless of user-supplied visibility setting.
-            if(x < WIDTH/2 - 100) then
+            if(x = 0) then
                 visible <= '0';
             end if;
 
