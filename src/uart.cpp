@@ -19,6 +19,19 @@ const eUSCI_UART_Config UART_cfg_115200_3MHz = {
 };
 
 
+const eUSCI_UART_Config UART_cfg_9600_3MHz = {
+    EUSCI_A_UART_CLOCKSOURCE_SMCLK, // SMCLK Clock Source
+    19, // BRDIV
+    8, // UCxBRF
+    0, // UCxBRS
+    EUSCI_A_UART_NO_PARITY,
+    EUSCI_A_UART_LSB_FIRST,
+    EUSCI_A_UART_ONE_STOP_BIT,
+    EUSCI_A_UART_MODE, // UART mode
+    EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION // Oversampling
+};
+
+
 /* Configuration for a MIDI-compatible UART at 31250 baud. */
 //const eUSCI_UART_Config UART_cfg_31250_12MHz = {
 //    EUSCI_A_UART_CLOCKSOURCE_SMCLK,
@@ -41,7 +54,8 @@ Semaphore backchannel_uart_mutex;
 void uart::init_port1() {
 #if TARGET_PCB
     MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, GPIO_PIN2 | GPIO_PIN3, GPIO_PRIMARY_MODULE_FUNCTION); // TODO shouldn't TX be Output func? It still works...
-    MAP_UART_initModule(EUSCI_A0_BASE, &UART_cfg_115200_3MHz);
+//    MAP_UART_initModule(EUSCI_A0_BASE, &UART_cfg_115200_3MHz);
+    MAP_UART_initModule(EUSCI_A0_BASE, &UART_cfg_9600_3MHz);
     MAP_UART_enableModule(EUSCI_A0_BASE);
 
 #else
@@ -51,6 +65,13 @@ void uart::init_port1() {
 
     // Initialize backchannel uart mutex
     albertOS::initSemaphore(backchannel_uart_mutex, 1);
+}
+
+void uart::init_guitar() {
+    // Initialize UART input from guitar.
+    MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P3, GPIO_PIN2, GPIO_PRIMARY_MODULE_FUNCTION); // TODO shouldn't TX be Output func? It still works...
+    MAP_UART_initModule(EUSCI_A2_BASE, &UART_cfg_9600_3MHz);
+    MAP_UART_enableModule(EUSCI_A2_BASE);
 }
 
 
