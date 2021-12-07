@@ -1,3 +1,3 @@
 [submodule "albertOS"]
-	path = albertOS
+	path = CCS-Software/albertOS
 	url = git@github.com:benjamin051000/albertOS.git
