@@ -45,13 +45,15 @@ architecture default of mcu_uart_fifo is
 
     -- Signal and reg to save incoming UART byte.
 	signal rx_byte : std_logic_vector(7 downto 0);
-	signal received : std_logic;
+	signal received, transmit : std_logic;
 
 begin
 
+	transmit <= '1' when rx_byte = x"4E" else '0';
+
     U_UART_IN: uart
 	generic map(
-		baud_rate => 115200,
+		baud_rate => 9600,
 		sys_clk_freq => 25000000 -- 25MHz
 	)
 	port map(
@@ -61,7 +63,7 @@ begin
 		tx => uart_tx,
 
 		-- Echo back what was sent.
-		transmit => received,
+		transmit => transmit,
 		tx_byte => rx_byte,
 
 		received => received, -- will be asserted for one clock cycle.
