@@ -94,7 +94,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="albertOS/main.cpp|BoardSupportPackage/src/bme280_support.c|BoardSupportPackage/src/bme280.c|BoardSupportPackage/src/bmi160_support.c|BoardSupportPackage/src/bmi160.c|albertOS/targetConfigs|albertOS/system_msp432p401r.c|albertOS/startup_msp432p401r_ccs.c|albertOS/msp432p401r.cmd|albertOS/BoardSupportPackage" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="albertOS/main.cpp|albertOS/targetConfigs|albertOS/system_msp432p401r.c|albertOS/startup_msp432p401r_ccs.c|albertOS/msp432p401r.cmd|albertOS/BoardSupportPackage" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
