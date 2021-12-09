@@ -10,6 +10,7 @@ The goal of Note Ninja is to provide a challenging yet entertaining version of c
 * Software target: Texas Instruments MSP432P401R on a custom PCB:
 
 <!-- TODO insert PCB screenshot -->
+![Diagram of custom Microprocessor PCB](/images/pcb_mcu.png)
 
 * FPGA target: Terasic DE10-Lite (10M50DAF484C7G)
 
